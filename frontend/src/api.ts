@@ -1,6 +1,6 @@
 import type { AlgorithmMeta, SortResponse } from './types';
 
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://localhost:8000';
+const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
 
 export async function getAlgorithms(): Promise<AlgorithmMeta[]> {
   const res = await fetch(`${BASE}/algorithms`);
