@@ -1,0 +1,13 @@
+{
+  "name": "sortviz",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"cyan,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && .venv/bin/uvicorn main:app --reload --port 8000",
+    "dev:frontend": "cd frontend && npm run dev",
+    "setup": "npm install && python3 -m venv backend/.venv && backend/.venv/bin/pip install -r backend/requirements.txt && cd frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
