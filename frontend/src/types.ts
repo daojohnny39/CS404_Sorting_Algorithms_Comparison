@@ -16,6 +16,24 @@ export interface SortStep {
   comparisons: number;
   swaps: number;
   array_accesses: number;
+  operation?: string;
+  description?: string;
+  pseudocode_line?: number;
+  range?: number[];
+  left_range?: number[];
+  right_range?: number[];
+  depth?: number;
+  segments?: number[][];        // each inner array: [left, right, depth]
+  merge_range?: number[];
+  temp_snapshot?: number[];
+  temp_left_range?: number[];
+  temp_right_range?: number[];
+  temp_left_ptr?: number;
+  temp_right_ptr?: number;
+  write_index?: number;
+  write_value?: number | null;
+  source_side?: string;
+  source_indices?: number[];
 }
 
 export interface SortResponse {

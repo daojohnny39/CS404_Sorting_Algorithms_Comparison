@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class AlgorithmMeta(BaseModel):
@@ -25,14 +25,32 @@ class SortRequest(BaseModel):
 
 
 class SortStep(BaseModel):
-    array: list[int]
-    comparing: list[int] = []
-    swapping: list[int] = []
-    overwriting: list[int] = []
-    sorted: list[int] = []
+    array: list[int] = Field(default_factory=list)
+    comparing: list[int] = Field(default_factory=list)
+    swapping: list[int] = Field(default_factory=list)
+    overwriting: list[int] = Field(default_factory=list)
+    sorted: list[int] = Field(default_factory=list)
     comparisons: int
     swaps: int
     array_accesses: int
+    operation: str = ""
+    description: str = ""
+    pseudocode_line: int = -1
+    range: list[int] = Field(default_factory=list)
+    left_range: list[int] = Field(default_factory=list)
+    right_range: list[int] = Field(default_factory=list)
+    depth: int = 0
+    segments: list[list[int]] = Field(default_factory=list)
+    merge_range: list[int] = Field(default_factory=list)
+    temp_snapshot: list[int] = Field(default_factory=list)
+    temp_left_range: list[int] = Field(default_factory=list)
+    temp_right_range: list[int] = Field(default_factory=list)
+    temp_left_ptr: int = -1
+    temp_right_ptr: int = -1
+    write_index: int = -1
+    write_value: int | None = None
+    source_side: str = ""
+    source_indices: list[int] = Field(default_factory=list)
 
 
 class SortResponse(BaseModel):
