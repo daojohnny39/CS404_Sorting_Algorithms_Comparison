@@ -10,29 +10,15 @@ interface Props {
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs text-[#94A3B8] uppercase tracking-wide">{label}</span>
-      <span className="text-xl font-mono font-medium text-[#F8FAFC] tabular-nums">{value}</span>
+      <span className="text-xs text-[#555555] uppercase tracking-wide">{label}</span>
+      <span className="text-xl font-mono font-bold text-black tabular-nums">{value}</span>
     </div>
   );
 }
 
-function Badge({
-  label,
-  value,
-  variant = 'default',
-}: {
-  label: string;
-  value: string;
-  variant?: 'default' | 'purple' | 'green';
-}) {
-  const colors =
-    variant === 'purple'
-      ? 'bg-[#8B5CF6]/10 text-[#C4B5FD] border-[#8B5CF6]/20'
-      : variant === 'green'
-        ? 'bg-[#22C55E]/10 text-[#86EFAC] border-[#22C55E]/20'
-        : 'bg-[#0F172A] text-[#94A3B8] border-[#334155]';
+function Badge({ label, value }: { label: string; value: string }) {
   return (
-    <span className={`px-2 py-0.5 rounded text-xs border font-mono ${colors}`}>
+    <span className="px-2 py-0.5 text-xs border border-black font-mono bg-white text-black">
       {label}: {value}
     </span>
   );
@@ -40,7 +26,7 @@ function Badge({
 
 export default function StatsPanel({ step, totalSteps, currentStep, algorithm }: Props) {
   return (
-    <div className="bg-[#1E293B] rounded-xl border border-[#475569] p-4">
+    <div className="bg-[#F5F5F5] border-2 border-black p-4">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Stat label="Comparisons" value={step?.comparisons ?? 0} />
         <Stat label="Swaps" value={step?.swaps ?? 0} />
@@ -52,16 +38,12 @@ export default function StatsPanel({ step, totalSteps, currentStep, algorithm }:
       </div>
 
       {algorithm && (
-        <div className="mt-4 pt-4 border-t border-[#334155] flex flex-wrap gap-2 items-center">
+        <div className="mt-4 pt-4 border-t border-[#BDBDBD] flex flex-wrap gap-2 items-center">
           <Badge label="Best" value={algorithm.time_complexity.best} />
           <Badge label="Avg" value={algorithm.time_complexity.average} />
           <Badge label="Worst" value={algorithm.time_complexity.worst} />
-          <Badge label="Space" value={algorithm.space_complexity} variant="purple" />
-          {algorithm.stable ? (
-            <Badge label="Stable" value="yes" variant="green" />
-          ) : (
-            <Badge label="Stable" value="no" />
-          )}
+          <Badge label="Space" value={algorithm.space_complexity} />
+          <Badge label="Stable" value={algorithm.stable ? 'yes' : 'no'} />
         </div>
       )}
     </div>

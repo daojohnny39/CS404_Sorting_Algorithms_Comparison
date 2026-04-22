@@ -30,17 +30,17 @@ const PSEUDOCODE: CodeLine[] = [
 const FUNCTION_HEADERS = new Set([0, 7]);
 
 const LEGEND = [
-  { label: 'Comparing',      color: '#EAB308' },
-  { label: 'Writing',        color: '#8B5CF6' },
-  { label: 'Left subarray',  color: '#3B82F6' },
-  { label: 'Right subarray', color: '#60A5FA' },
-  { label: 'Locally sorted', color: '#14B8A6' },
-  { label: 'Complete',       color: '#22C55E' },
+  { label: 'Comparing',      color: '#000000' },
+  { label: 'Writing',        color: '#333333' },
+  { label: 'Left subarray',  color: '#777777' },
+  { label: 'Right subarray', color: '#999999' },
+  { label: 'Locally sorted', color: '#A6A6A6' },
+  { label: 'Complete',       color: '#D9D9D9' },
 ];
 
 export default function PseudocodePanel({ activeLine, step }: Props) {
   return (
-    <div className="bg-[#1E293B] rounded-xl border border-[#475569] p-4 flex flex-col gap-3">
+    <div className="bg-[#F5F5F5] border-2 border-black p-4 flex flex-col gap-3">
       <div className="font-mono">
         {PSEUDOCODE.map((line, idx) => {
           if (line.lineNum === -2) {
@@ -53,9 +53,9 @@ export default function PseudocodePanel({ activeLine, step }: Props) {
             <div
               key={line.lineNum}
               style={{
-                backgroundColor: isActive ? 'rgba(234,179,8,0.15)' : 'transparent',
-                borderLeft: isActive ? '2px solid #EAB308' : '2px solid transparent',
-                color: isActive ? '#EAB308' : isHeader ? '#F8FAFC' : '#94A3B8',
+                backgroundColor: isActive ? '#E0E0E0' : 'transparent',
+                borderLeft: isActive ? '4px solid #000000' : '4px solid transparent',
+                color: isActive ? '#000000' : isHeader ? '#000000' : '#555555',
                 transition: 'background-color 150ms ease, border-color 150ms ease, color 150ms ease',
               }}
               className="text-xs px-2 py-0.5 whitespace-pre leading-relaxed"
@@ -67,17 +67,22 @@ export default function PseudocodePanel({ activeLine, step }: Props) {
       </div>
 
       {step?.description && (
-        <p className="text-xs text-[#94A3B8] leading-snug">{step.description}</p>
+        <p className="text-xs text-[#555555] leading-snug">{step.description}</p>
       )}
 
       <div className="flex flex-wrap gap-x-3 gap-y-1.5">
         {LEGEND.map((item) => (
           <div key={item.label} className="flex items-center gap-1">
             <div
-              className="rounded-sm flex-shrink-0"
-              style={{ width: 10, height: 10, backgroundColor: item.color }}
+              className="flex-shrink-0"
+              style={{
+                width: 10,
+                height: 10,
+                backgroundColor: item.color,
+                border: '1px solid #000000',
+              }}
             />
-            <span className="text-[10px] text-[#64748B]">{item.label}</span>
+            <span className="text-[10px] text-[#555555]">{item.label}</span>
           </div>
         ))}
       </div>

@@ -14,34 +14,34 @@ export default function App() {
     sorter.steps.length > 0 && sorter.currentStep < sorter.steps.length - 1;
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC]">
+    <div className="min-h-screen bg-white text-black">
       <Header />
 
       {/* Hero */}
       <div className="max-w-7xl mx-auto px-4 pt-14 pb-8 text-center">
-        <h1 className="text-4xl font-bold text-[#F8FAFC] mb-3 tracking-tight">
+        <h1 className="text-4xl font-bold text-black mb-3">
           Sorting Algorithm Visualizer
         </h1>
-        <p className="text-[#94A3B8] text-lg max-w-xl mx-auto">
+        <p className="text-[#555555] text-lg max-w-xl mx-auto">
           Interactive step-by-step visualizations of classic sorting algorithms.
         </p>
-        <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-[#475569] animate-pulse">
+        <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-[#777777]">
           <span>Scroll down to explore Merge Sort</span>
           <span>↓</span>
         </div>
       </div>
 
       {/* Merge Sort scroll demo */}
-      <div className="border-t border-[#1E293B]">
+      <div className="border-t-2 border-black">
         <ScrollSortVisualizer />
       </div>
 
       {/* Algorithm Playground */}
-      <div className="border-t border-[#1E293B] mt-4">
+      <div className="border-t-2 border-black mt-4">
         <div className="max-w-7xl mx-auto px-4 py-10 space-y-4">
           <div className="mb-2">
-            <h2 className="text-xl font-bold text-[#F8FAFC]">Algorithm Playground</h2>
-            <p className="text-sm text-[#94A3B8] mt-1">
+            <h2 className="text-xl font-bold text-black">Algorithm Playground</h2>
+            <p className="text-sm text-[#555555] mt-1">
               Select any algorithm and play or step through at your own pace.
             </p>
           </div>

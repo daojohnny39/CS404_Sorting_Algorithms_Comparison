@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-family-sans: 'IBM Plex Mono', 'Courier New', Courier, monospace;
 }
 
 * {
@@ -9,16 +9,18 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  background-color: #0F172A;
+  font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+  background-color: #ffffff;
+  color: #000000;
 }
 
 input[type='range'] {
-  accent-color: #22C55E;
+  accent-color: #000000;
 }

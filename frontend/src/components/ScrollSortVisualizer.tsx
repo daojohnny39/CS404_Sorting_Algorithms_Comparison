@@ -59,11 +59,11 @@ export default function ScrollSortVisualizer() {
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-medium text-[#64748B] uppercase tracking-widest mb-2">
+            <p className="text-xs font-bold text-[#777777] uppercase tracking-widest mb-2">
               Scroll to explore
             </p>
-            <h2 className="text-3xl font-bold tracking-tight text-[#F8FAFC]">Merge Sort</h2>
-            <p className="text-[#64748B] text-sm mt-2">
+            <h2 className="text-3xl font-bold text-black">Merge Sort</h2>
+            <p className="text-[#555555] text-sm mt-2">
               10 elements ·{' '}
               {steps.length > 0 ? `${steps.length} steps` : loading ? 'loading…' : ''}
             </p>
@@ -73,7 +73,7 @@ export default function ScrollSortVisualizer() {
               {['O(n log n)', 'stable', 'O(n) space'].map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-[#64748B] border border-white/10"
+                  className="px-2.5 py-1 text-xs font-bold bg-white text-black border border-black"
                 >
                   {tag}
                 </span>
@@ -82,18 +82,18 @@ export default function ScrollSortVisualizer() {
             <button
               onClick={handleNewArray}
               disabled={loading}
-              className="px-4 py-2 rounded-full text-sm font-medium bg-white/8 text-[#F8FAFC] border border-white/15 hover:bg-white/12 hover:border-white/25 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-2 text-sm font-bold bg-white text-black border-2 border-black hover:bg-[#E0E0E0] transition-colors duration-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               New Array
             </button>
           </div>
         </div>
 
-        {/* Thin progress bar */}
+        {/* Progress bar */}
         {steps.length > 0 && (
-          <div className="mt-6 h-[2px] rounded-full bg-white/6 overflow-hidden">
+          <div className="mt-6 h-3 bg-white border border-black overflow-hidden">
             <div
-              className="h-full rounded-full bg-[#22C55E] transition-all duration-100"
+              className="h-full bg-black transition-all duration-100"
               style={{ width: `${progress * 100}%` }}
             />
           </div>
@@ -102,8 +102,8 @@ export default function ScrollSortVisualizer() {
 
       {error && (
         <div className="max-w-7xl mx-auto px-6 mb-4">
-          <p className="text-sm text-red-400 bg-red-400/8 border border-red-400/20 rounded-xl px-4 py-3">
-            {error}
+          <p className="text-sm text-black bg-white border-2 border-black px-4 py-3">
+            ERROR: {error}
           </p>
         </div>
       )}
@@ -122,11 +122,11 @@ export default function ScrollSortVisualizer() {
 
               {/* Top bar: step counter + operation chip */}
               <div className="flex items-center justify-between flex-shrink-0">
-                <span className="text-xs tabular-nums text-[#475569]">
+                <span className="text-xs tabular-nums text-[#777777]">
                   {steps.length > 0 ? `${stepIndex + 1} / ${steps.length}` : '—'}
                 </span>
                 {opLabel && (
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[#94A3B8]">
+                  <span className="text-xs font-bold px-2.5 py-1 bg-white border border-black text-black">
                     {opLabel}
                   </span>
                 )}
@@ -143,11 +143,11 @@ export default function ScrollSortVisualizer() {
               {/* Step description */}
               <div className="flex-shrink-0 min-h-[3rem]">
                 {currentStep?.description ? (
-                  <p className="text-[#94A3B8] text-sm leading-relaxed">
+                  <p className="text-[#555555] text-sm leading-relaxed">
                     {currentStep.description}
                   </p>
                 ) : (
-                  <p className="text-[#334155] text-sm">
+                  <p className="text-[#AAAAAA] text-sm">
                     {loading ? 'Loading steps from server…' : 'Scroll down to begin.'}
                   </p>
                 )}
@@ -157,15 +157,15 @@ export default function ScrollSortVisualizer() {
               <div className="flex-1" />
 
               {/* Stats strip */}
-              <div className="flex-shrink-0 flex items-center gap-6 border-t border-white/6 pt-4">
+              <div className="flex-shrink-0 flex items-center gap-6 border-t-2 border-black pt-4">
                 {[
                   { label: 'Comparisons', value: currentStep?.comparisons ?? 0 },
                   { label: 'Writes',      value: currentStep?.swaps ?? 0 },
                   { label: 'Accesses',    value: currentStep?.array_accesses ?? 0 },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <div className="text-[10px] uppercase tracking-widest text-[#475569] mb-0.5">{label}</div>
-                    <div className="text-2xl font-mono font-semibold text-[#F8FAFC] tabular-nums leading-none">
+                    <div className="text-[10px] uppercase tracking-widest text-[#777777] mb-0.5">{label}</div>
+                    <div className="text-2xl font-bold font-mono tabular-nums leading-none text-black">
                       {value}
                     </div>
                   </div>

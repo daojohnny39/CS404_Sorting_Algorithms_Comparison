@@ -9,29 +9,29 @@ interface Props {
 export default function AlgorithmSelector({ algorithms, selected, onSelect }: Props) {
   return (
     <section>
-      <h2 className="text-xs font-medium text-[#94A3B8] uppercase tracking-widest mb-3">
+      <h2 className="text-xs font-bold text-[#555555] uppercase tracking-widest mb-3">
         Algorithm
       </h2>
       <div className="flex gap-2 flex-wrap">
         {algorithms.length === 0 && (
-          <p className="text-sm text-[#64748B]">Loading algorithms…</p>
+          <p className="text-sm text-[#777777]">Loading algorithms…</p>
         )}
         {algorithms.map((algo) => (
           <button
             key={algo.id}
             onClick={() => onSelect(algo.id)}
             className={[
-              'px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-150 cursor-pointer',
+              'px-4 py-2 border text-sm font-bold transition-colors duration-100 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-black focus-visible:outline-offset-2',
               selected === algo.id
-                ? 'border-[#22C55E] bg-[#22C55E]/10 text-[#22C55E]'
-                : 'border-[#475569] bg-[#1E293B] text-[#F8FAFC] hover:border-[#64748B] hover:bg-[#273548]',
+                ? 'border-black bg-black text-white'
+                : 'border-black bg-white text-black hover:bg-[#E0E0E0]',
             ].join(' ')}
           >
             {algo.name}
             <span
               className={[
                 'ml-2 text-xs font-mono',
-                selected === algo.id ? 'text-[#22C55E]/70' : 'text-[#64748B]',
+                selected === algo.id ? 'text-[#AAAAAA]' : 'text-[#555555]',
               ].join(' ')}
             >
               {algo.time_complexity.worst}

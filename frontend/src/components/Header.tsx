@@ -1,11 +1,11 @@
 export default function Header() {
   return (
-    <header className="sticky top-0 z-10 border-b border-[#475569] bg-[#0F172A]/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-10 border-b-2 border-black bg-[#C0C0C0]">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-        <span className="text-lg font-semibold tracking-tight text-[#F8FAFC]">
-          Sort<span className="text-[#22C55E]">Viz</span>
+        <span className="text-lg font-bold tracking-tight text-black">
+          SortViz
         </span>
-        <span className="text-sm text-[#94A3B8]">CS 404 Mini Project</span>
+        <span className="text-sm text-[#333333]">CS 404 Mini Project</span>
       </div>
     </header>
   );
