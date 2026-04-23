@@ -24,7 +24,7 @@ export function usePlayback(totalSteps: number) {
         }
         return prev + 1;
       });
-    }, 200 / speed);
+    }, 400 / speed);
 
     return () => clearInterval(id);
   }, [isPlaying, speed, totalSteps]);

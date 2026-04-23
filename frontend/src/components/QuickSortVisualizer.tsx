@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useSortSteps } from '../hooks/useSortSteps';
 import { usePlayback } from '../hooks/usePlayback';
-import BubbleSortTileGrid from './BubbleSortTileGrid';
-import BubblePseudocodePanel from './BubblePseudocodePanel';
+import QuickSortTileGrid from './QuickSortTileGrid';
+import QuickPseudocodePanel from './QuickPseudocodePanel';
 
 function generateArray(): number[] {
   const values = Array.from({ length: 90 }, (_, i) => i + 10);
@@ -15,19 +15,20 @@ function generateArray(): number[] {
 
 const OPERATION_LABELS: Record<string, string> = {
   start:          'Initializing',
-  pass_start:     'Pass Start',
+  quick_call:     'Sorting Range',
+  pivot_select:   'Pivot',
   compare:        'Comparing',
   swap:           'Swapping',
   swapped:        'Swapped',
-  element_sorted: 'Sorted',
-  early_exit:     'Early Exit',
+  pivot_place:    'Placing Pivot',
+  partition_done: 'Partitioned',
+  base_case:      'Base Case',
   complete:       'Complete',
 };
 
-export default function BubbleSortVisualizer() {
+export default function QuickSortVisualizer() {
   const [array, setArray] = useState<number[]>(() => generateArray());
-
-  const { steps, loading, error } = useSortSteps('bubble', array);
+  const { steps, loading, error } = useSortSteps('quick', array);
   const { playStepIndex, playbackState, isPlaying, speed, play, pause, resume, reset, cycleSpeed } =
     usePlayback(steps.length);
 
@@ -36,44 +37,32 @@ export default function BubbleSortVisualizer() {
   const currentStep = hasStarted && steps.length > 0 ? steps[activeStepIndex] : null;
   const displayArray = currentStep ? currentStep.array : array;
   const progress = hasStarted && steps.length > 0 ? (activeStepIndex + 1) / steps.length : 0;
-
   const canPlay = !loading && !error && steps.length > 0;
 
-  const handleNewArray = () => {
-    reset();
-    setArray(generateArray());
-  };
-
+  const handleNewArray = () => { reset(); setArray(generateArray()); };
   const handlePlayPause = () => {
-    if (isPlaying) {
-      pause();
-    } else if (playbackState === 'paused') {
-      resume();
-    } else {
-      play(0);
-    }
+    if (isPlaying) pause();
+    else if (playbackState === 'paused') resume();
+    else play(0);
   };
-
   const playLabel =
     isPlaying ? 'Pause' :
     playbackState === 'paused' ? 'Resume' :
     playbackState === 'done' ? 'Replay' :
     'Play';
-
   const opLabel = currentStep?.operation
     ? (OPERATION_LABELS[currentStep.operation] ?? currentStep.operation)
     : null;
 
   return (
     <section>
-      {/* Section header */}
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold text-[#777777] uppercase tracking-widest mb-2">
               Press Play to begin
             </p>
-            <h2 className="text-3xl font-bold text-black">Bubble Sort</h2>
+            <h2 className="text-3xl font-bold text-black">Quick Sort</h2>
             <p className="text-[#555555] text-sm mt-2">
               10 elements ·{' '}
               {steps.length > 0 ? `${steps.length} steps` : loading ? 'loading…' : ''}
@@ -81,11 +70,8 @@ export default function BubbleSortVisualizer() {
           </div>
           <div className="flex items-center gap-3 pb-1">
             <div className="flex gap-1.5">
-              {['O(n²)', 'stable', 'O(1) space'].map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2.5 py-1 text-xs font-bold bg-white text-black border border-black"
-                >
+              {['O(n log n) avg', 'O(n²) worst', 'unstable'].map((tag) => (
+                <span key={tag} className="px-2.5 py-1 text-xs font-bold bg-white text-black border border-black">
                   {tag}
                 </span>
               ))}
@@ -116,7 +102,6 @@ export default function BubbleSortVisualizer() {
           </div>
         </div>
 
-        {/* Progress bar — only visible after playback starts */}
         {hasStarted && steps.length > 0 && (
           <div className="mt-6 h-3 bg-white border border-black overflow-hidden">
             <div
@@ -135,13 +120,8 @@ export default function BubbleSortVisualizer() {
         </div>
       )}
 
-      {/* Visualizer panel */}
       <div className="max-w-7xl mx-auto px-6 py-6 flex gap-6">
-
-        {/* ── Left column: tiles + context ── */}
         <div className="flex flex-col flex-1 min-w-0 gap-4">
-
-          {/* Step counter + operation chip */}
           <div className="flex items-center justify-between flex-shrink-0">
             <span className="text-xs tabular-nums text-[#777777]">
               {hasStarted && steps.length > 0 ? `${activeStepIndex + 1} / ${steps.length}` : '—'}
@@ -153,19 +133,13 @@ export default function BubbleSortVisualizer() {
             )}
           </div>
 
-          <div className="flex-none h-4" />
-
-          {/* Tile grid */}
           <div className="flex-shrink-0">
-            <BubbleSortTileGrid array={displayArray} step={currentStep} />
+            <QuickSortTileGrid array={displayArray} step={currentStep} />
           </div>
 
-          {/* Step description */}
           <div className="flex-shrink-0 min-h-[3rem]">
             {currentStep?.description ? (
-              <p className="text-[#555555] text-sm leading-relaxed">
-                {currentStep.description}
-              </p>
+              <p className="text-[#555555] text-sm leading-relaxed">{currentStep.description}</p>
             ) : (
               <p className="text-[#AAAAAA] text-sm">
                 {loading ? 'Loading steps from server…' : 'Press Play to begin.'}
@@ -173,9 +147,6 @@ export default function BubbleSortVisualizer() {
             )}
           </div>
 
-          <div className="h-6" />
-
-          {/* Stats strip */}
           <div className="flex-shrink-0 flex items-center gap-6 border-t-2 border-black pt-4">
             {[
               { label: 'Comparisons', value: currentStep?.comparisons ?? 0 },
@@ -184,17 +155,14 @@ export default function BubbleSortVisualizer() {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-[10px] uppercase tracking-widest text-[#777777] mb-0.5">{label}</div>
-                <div className="text-2xl font-bold font-mono tabular-nums leading-none text-black">
-                  {value}
-                </div>
+                <div className="text-2xl font-bold font-mono tabular-nums leading-none text-black">{value}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Right column: pseudocode ── */}
         <div className="w-[340px] flex-shrink-0 overflow-y-auto">
-          <BubblePseudocodePanel
+          <QuickPseudocodePanel
             activeLine={currentStep?.pseudocode_line ?? -1}
             step={currentStep}
           />

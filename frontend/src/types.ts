@@ -34,6 +34,9 @@ export interface SortStep {
   write_value?: number | null;
   source_side?: string;
   source_indices?: number[];
+  pivot_index?: number;
+  partition_index?: number;
+  scan_index?: number;
 }
 
 export interface SortResponse {

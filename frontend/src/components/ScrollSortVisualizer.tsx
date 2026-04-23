@@ -136,7 +136,7 @@ export default function ScrollSortVisualizer() {
       )}
 
       {/* Visualizer panel */}
-      <div className="max-w-7xl mx-auto px-6 min-h-[calc(100svh-56px)] py-6 flex gap-6">
+      <div className="max-w-7xl mx-auto px-6 py-6 flex gap-6">
 
         {/* ── Left column: tiles + context ── */}
         <div className="flex flex-col flex-1 min-w-0 gap-4">

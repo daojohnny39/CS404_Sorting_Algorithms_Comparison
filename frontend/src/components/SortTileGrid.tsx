@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { motion } from 'motion/react';
 import type { SortStep } from '../types';
 
@@ -66,30 +65,9 @@ function getSegmentDepth(index: number, segments: number[][] | undefined): numbe
   return seg ? seg[2] : 0;
 }
 
-function getEffectiveIndex(value: number, array: number[], step: SortStep | null): number {
-  if (
-    step &&
-    (step.operation === 'write' || step.operation === 'copy_remaining') &&
-    step.write_value === value &&
-    step.write_index !== undefined &&
-    step.write_index !== null
-  ) {
-    return step.write_index;
-  }
-  return array.indexOf(value);
-}
-
 export default function SortTileGrid({ array, step }: Props) {
   const n = array.length;
   const MAX_DEPTH = n > 1 ? Math.ceil(Math.log2(n)) : 0;
-
-  const lastKnownPositions = useRef<Map<number, number>>(new Map());
-  const prevArrayRef = useRef<number[]>(array);
-
-  if (prevArrayRef.current !== array) {
-    prevArrayRef.current = array;
-    lastKnownPositions.current.clear();
-  }
 
   const hasTempRow = Boolean(step?.temp_snapshot?.length);
   const containerHeight =
@@ -98,44 +76,22 @@ export default function SortTileGrid({ array, step }: Props) {
 
   const centerPct = (i: number) => ((i + 0.5) / n) * 100;
 
-  // Build deduplicated tile list to track identity (value) rather than index
-  const seenInCurrent = new Set<number>(array);
-  const seen = new Set<number>();
-  const tiles: Array<{ value: number; effectiveIndex: number; displaced: boolean }> = [];
-
-  for (const v of array) {
-    if (!seen.has(v)) {
-      seen.add(v);
-      const effectiveIndex = getEffectiveIndex(v, array, step);
-      lastKnownPositions.current.set(v, effectiveIndex);
-      tiles.push({ value: v, effectiveIndex, displaced: false });
-    }
-  }
-
-  for (const [v, lastIndex] of lastKnownPositions.current) {
-    if (!seenInCurrent.has(v)) {
-      tiles.push({ value: v, effectiveIndex: lastIndex, displaced: true });
-    }
-  }
-
   return (
     <div style={{ position: 'relative', width: '100%', height: containerHeight }}>
 
       {/* ── Main array tiles ── */}
-      {tiles.map(({ value, effectiveIndex, displaced }) => {
-        const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step, n);
-        const segDepth = displaced ? 0 : getSegmentDepth(effectiveIndex, step?.segments);
+      {array.map((value, i) => {
+        const tileStyle = getTileStyle(i, step, n);
+        const segDepth = getSegmentDepth(i, step?.segments);
         const animY = segDepth * ROW_HEIGHT + tileStyle.liftY;
-
-        const initialLeft = `${centerPct(effectiveIndex)}%`;
 
         return (
           <motion.div
-            key={value}
-            initial={{ left: initialLeft }}
+            key={i}
             style={{
               position: 'absolute',
               top: 0,
+              left: `${centerPct(i)}%`,
               x: '-50%',
               width: TILE_SIZE,
               height: TILE_SIZE,
@@ -150,25 +106,22 @@ export default function SortTileGrid({ array, step }: Props) {
               zIndex: tileStyle.scale > 1 ? 20 : 10,
             }}
             animate={{
-              left: `${centerPct(effectiveIndex)}%`,
               y: animY,
               scale: tileStyle.scale,
               backgroundColor: tileStyle.bg,
               borderColor: tileStyle.borderColor,
               boxShadow: tileStyle.boxShadow,
-              opacity: displaced ? 0 : 1,
             }}
             transition={{
-              left: SPRING,
               y: SPRING,
               scale: SPRING,
               backgroundColor: COLOR_TRANSITION,
               borderColor: COLOR_TRANSITION,
               boxShadow: COLOR_TRANSITION,
-              opacity: COLOR_TRANSITION,
             }}
           >
             <motion.span
+              key={value}
               animate={{ color: tileStyle.textColor }}
               transition={COLOR_TRANSITION}
               style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
@@ -176,7 +129,7 @@ export default function SortTileGrid({ array, step }: Props) {
               {value}
             </motion.span>
             <span style={{ fontSize: '9px', color: 'rgba(0,0,0,0.25)', lineHeight: 1, marginTop: '2px' }}>
-              {effectiveIndex}
+              {i}
             </span>
           </motion.div>
         );

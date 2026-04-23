@@ -51,6 +51,9 @@ class SortStep(BaseModel):
     write_value: int | None = None
     source_side: str = ""
     source_indices: list[int] = Field(default_factory=list)
+    pivot_index: int = -1
+    partition_index: int = -1
+    scan_index: int = -1
 
 
 class SortResponse(BaseModel):

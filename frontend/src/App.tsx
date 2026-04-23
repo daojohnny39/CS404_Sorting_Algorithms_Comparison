@@ -7,6 +7,7 @@ import StatsPanel from './components/StatsPanel';
 import StatusMessage from './components/StatusMessage';
 import ScrollSortVisualizer from './components/ScrollSortVisualizer';
 import BubbleSortVisualizer from './components/BubbleSortVisualizer';
+import QuickSortVisualizer from './components/QuickSortVisualizer';
 
 export default function App() {
   const sorter = useSorter();
@@ -27,7 +28,7 @@ export default function App() {
           Interactive step-by-step visualizations of classic sorting algorithms.
         </p>
         <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-[#777777]">
-          <span>Scroll down to explore Bubble Sort &amp; Merge Sort</span>
+          <span>Scroll down to explore Bubble Sort, Merge Sort &amp; Quick Sort</span>
           <span>↓</span>
         </div>
       </div>
@@ -40,6 +41,11 @@ export default function App() {
       {/* Merge Sort scroll demo */}
       <div className="border-t-2 border-black">
         <ScrollSortVisualizer />
+      </div>
+
+      {/* Quick Sort scroll demo */}
+      <div className="border-t-2 border-black">
+        <QuickSortVisualizer />
       </div>
 
       {/* Algorithm Playground */}
