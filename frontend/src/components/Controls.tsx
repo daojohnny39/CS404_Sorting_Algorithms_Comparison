@@ -3,7 +3,6 @@ import type { PlaybackStatus } from '../types';
 interface Props {
   status: PlaybackStatus;
   speed: number;
-  arraySize: number;
   stepAvailable: boolean;
   onPlay: () => void;
   onPause: () => void;
@@ -11,7 +10,6 @@ interface Props {
   onReset: () => void;
   onGenerate: () => void;
   onSpeedChange: (s: number) => void;
-  onArraySizeChange: (s: number) => void;
 }
 
 const btn =
@@ -20,7 +18,6 @@ const btn =
 export default function Controls({
   status,
   speed,
-  arraySize,
   stepAvailable,
   onPlay,
   onPause,
@@ -28,7 +25,6 @@ export default function Controls({
   onReset,
   onGenerate,
   onSpeedChange,
-  onArraySizeChange,
 }: Props) {
   const isPlaying = status === 'playing';
   const isLoading = status === 'loading';
@@ -94,21 +90,6 @@ export default function Controls({
           />
         </div>
 
-        {/* Array size */}
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-[#555555] whitespace-nowrap select-none">
-            Size: {arraySize}
-          </label>
-          <input
-            type="range"
-            min={10}
-            max={100}
-            value={arraySize}
-            disabled={isBusy}
-            onChange={(e) => onArraySizeChange(Number(e.target.value))}
-            className="w-24"
-          />
-        </div>
       </div>
     </div>
   );

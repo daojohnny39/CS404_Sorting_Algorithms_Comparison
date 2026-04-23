@@ -1,13 +1,39 @@
 import { useSorter } from './hooks/useSorter';
-import Header from './components/Header';
 import AlgorithmSelector from './components/AlgorithmSelector';
-import BarVisualizer from './components/BarVisualizer';
 import Controls from './components/Controls';
 import StatsPanel from './components/StatsPanel';
 import StatusMessage from './components/StatusMessage';
-import ScrollSortVisualizer from './components/ScrollSortVisualizer';
-import BubbleSortVisualizer from './components/BubbleSortVisualizer';
-import QuickSortVisualizer from './components/QuickSortVisualizer';
+import BubbleSortTileGrid from './components/BubbleSortTileGrid';
+import SortTileGrid from './components/SortTileGrid';
+import QuickSortTileGrid from './components/QuickSortTileGrid';
+import BubblePseudocodePanel from './components/BubblePseudocodePanel';
+import PseudocodePanel from './components/PseudocodePanel';
+import QuickPseudocodePanel from './components/QuickPseudocodePanel';
+
+const OPERATION_LABELS: Record<string, string> = {
+  // Shared
+  start:          'Initializing',
+  complete:       'Complete',
+  compare:        'Comparing',
+  swap:           'Swapping',
+  swapped:        'Swapped',
+  // Bubble Sort
+  pass_start:     'Pass Start',
+  element_sorted: 'Sorted',
+  early_exit:     'Early Exit',
+  // Quick Sort
+  quick_call:     'Sorting Range',
+  pivot_select:   'Pivot',
+  pivot_place:    'Placing Pivot',
+  partition_done: 'Partitioned',
+  base_case:      'Base Case',
+  // Merge Sort
+  split:          'Splitting',
+  merge_init:     'Merging',
+  write:          'Writing',
+  copy_remaining: 'Copying',
+  merged:         'Merged',
+};
 
 export default function App() {
   const sorter = useSorter();
@@ -15,39 +41,17 @@ export default function App() {
   const stepAvailable =
     sorter.steps.length > 0 && sorter.currentStep < sorter.steps.length - 1;
 
+  const opLabel = sorter.currentStepData?.operation
+    ? (OPERATION_LABELS[sorter.currentStepData.operation] ?? sorter.currentStepData.operation)
+    : null;
+
+  const stepLabel =
+    sorter.currentStep >= 0 && sorter.steps.length > 0
+      ? `${sorter.currentStep + 1} / ${sorter.steps.length}`
+      : '—';
+
   return (
     <div className="min-h-screen bg-white text-black">
-      <Header />
-
-      {/* Hero */}
-      <div className="max-w-7xl mx-auto px-4 pt-14 pb-8 text-center">
-        <h1 className="text-4xl font-bold text-black mb-3">
-          Sorting Algorithm Visualizer
-        </h1>
-        <p className="text-[#555555] text-lg max-w-xl mx-auto">
-          Interactive step-by-step visualizations of classic sorting algorithms.
-        </p>
-        <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-[#777777]">
-          <span>Scroll down to explore Bubble Sort, Merge Sort &amp; Quick Sort</span>
-          <span>↓</span>
-        </div>
-      </div>
-
-      {/* Bubble Sort scroll demo */}
-      <div className="border-t-2 border-black">
-        <BubbleSortVisualizer />
-      </div>
-
-      {/* Merge Sort scroll demo */}
-      <div className="border-t-2 border-black">
-        <ScrollSortVisualizer />
-      </div>
-
-      {/* Quick Sort scroll demo */}
-      <div className="border-t-2 border-black">
-        <QuickSortVisualizer />
-      </div>
-
       {/* Algorithm Playground */}
       <div className="border-t-2 border-black mt-4">
         <div className="max-w-7xl mx-auto px-4 py-10 space-y-4">
@@ -57,16 +61,16 @@ export default function App() {
               Select any algorithm and play or step through at your own pace.
             </p>
           </div>
+
           <AlgorithmSelector
             algorithms={sorter.algorithms}
             selected={sorter.selectedAlgorithm}
             onSelect={sorter.selectAlgorithm}
           />
-          <BarVisualizer array={sorter.array} step={sorter.currentStepData} />
+
           <Controls
             status={sorter.status}
             speed={sorter.speed}
-            arraySize={sorter.arraySize}
             stepAvailable={stepAvailable}
             onPlay={sorter.play}
             onPause={sorter.pause}
@@ -74,14 +78,91 @@ export default function App() {
             onReset={sorter.reset}
             onGenerate={sorter.generateArray}
             onSpeedChange={sorter.setSpeed}
-            onArraySizeChange={sorter.setArraySize}
           />
-          <StatsPanel
-            step={sorter.currentStepData}
-            totalSteps={sorter.steps.length}
-            currentStep={sorter.currentStep}
-            algorithm={sorter.selectedAlgorithmMeta}
-          />
+
+          {/* Two-column: tile grid left, pseudocode right */}
+          <div className="flex gap-6">
+
+            {/* Left column */}
+            <div className="flex-1 min-w-0 flex flex-col gap-4">
+
+              {/* Step counter + operation chip */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs tabular-nums text-[#777777]">{stepLabel}</span>
+                {opLabel && (
+                  <span className="text-xs font-bold px-2.5 py-1 bg-white border border-black text-black">
+                    {opLabel}
+                  </span>
+                )}
+              </div>
+
+              {/* Tile grid — min-height accommodates the tallest grid (Quick Sort ~416px) */}
+              <div style={{ minHeight: 420 }}>
+                {sorter.selectedAlgorithm === 'bubble' && (
+                  <BubbleSortTileGrid array={sorter.array} step={sorter.currentStepData} />
+                )}
+                {sorter.selectedAlgorithm === 'merge' && (
+                  <SortTileGrid array={sorter.array} step={sorter.currentStepData} />
+                )}
+                {sorter.selectedAlgorithm === 'quick' && (
+                  <QuickSortTileGrid array={sorter.array} step={sorter.currentStepData} />
+                )}
+                {!sorter.selectedAlgorithm && (
+                  <div className="h-28 flex items-center justify-center text-[#AAAAAA] text-sm border-2 border-dashed border-[#DDDDDD]">
+                    Select an algorithm to begin
+                  </div>
+                )}
+              </div>
+
+              {/* Step description */}
+              <div className="min-h-[3rem]">
+                {sorter.currentStepData?.description ? (
+                  <p className="text-[#555555] text-sm leading-relaxed">
+                    {sorter.currentStepData.description}
+                  </p>
+                ) : (
+                  <p className="text-[#AAAAAA] text-sm">
+                    {sorter.status === 'loading'
+                      ? 'Loading steps from server…'
+                      : sorter.selectedAlgorithm
+                        ? 'Press Play to begin.'
+                        : ''}
+                  </p>
+                )}
+              </div>
+
+              {/* Stats + complexity */}
+              <StatsPanel
+                step={sorter.currentStepData}
+                totalSteps={sorter.steps.length}
+                currentStep={sorter.currentStep}
+                algorithm={sorter.selectedAlgorithmMeta}
+              />
+            </div>
+
+            {/* Right column — pseudocode panel */}
+            <div className="w-[340px] flex-shrink-0">
+              {sorter.selectedAlgorithm === 'bubble' && (
+                <BubblePseudocodePanel
+                  activeLine={sorter.currentStepData?.pseudocode_line ?? -1}
+                  step={sorter.currentStepData}
+                />
+              )}
+              {sorter.selectedAlgorithm === 'merge' && (
+                <PseudocodePanel
+                  activeLine={sorter.currentStepData?.pseudocode_line ?? -1}
+                  step={sorter.currentStepData}
+                />
+              )}
+              {sorter.selectedAlgorithm === 'quick' && (
+                <QuickPseudocodePanel
+                  activeLine={sorter.currentStepData?.pseudocode_line ?? -1}
+                  step={sorter.currentStepData}
+                />
+              )}
+            </div>
+          </div>
+
           <StatusMessage
             status={sorter.status}
             error={sorter.error}

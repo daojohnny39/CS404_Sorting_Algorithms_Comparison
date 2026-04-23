@@ -15,22 +15,6 @@ ALGORITHMS: list[AlgorithmMeta] = [
         stable=True,
     ),
     AlgorithmMeta(
-        id="selection",
-        name="Selection Sort",
-        time_complexity={"best": "O(n²)", "average": "O(n²)", "worst": "O(n²)"},
-        space_complexity="O(1)",
-        description="Divides the array into a sorted and unsorted region, repeatedly selecting the minimum from the unsorted region.",
-        stable=False,
-    ),
-    AlgorithmMeta(
-        id="insertion",
-        name="Insertion Sort",
-        time_complexity={"best": "O(n)", "average": "O(n²)", "worst": "O(n²)"},
-        space_complexity="O(1)",
-        description="Builds the sorted array one element at a time by inserting each element into its correct position.",
-        stable=True,
-    ),
-    AlgorithmMeta(
         id="merge",
         name="Merge Sort",
         time_complexity={"best": "O(n log n)", "average": "O(n log n)", "worst": "O(n log n)"},
@@ -44,14 +28,6 @@ ALGORITHMS: list[AlgorithmMeta] = [
         time_complexity={"best": "O(n log n)", "average": "O(n log n)", "worst": "O(n²)"},
         space_complexity="O(log n)",
         description="Selects a pivot and partitions the array into elements less than and greater than the pivot, then recurses.",
-        stable=False,
-    ),
-    AlgorithmMeta(
-        id="heap",
-        name="Heap Sort",
-        time_complexity={"best": "O(n log n)", "average": "O(n log n)", "worst": "O(n log n)"},
-        space_complexity="O(1)",
-        description="Converts the array into a max-heap, then repeatedly extracts the maximum to build the sorted output.",
         stable=False,
     ),
 ]

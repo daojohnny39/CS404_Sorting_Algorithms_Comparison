@@ -3,7 +3,12 @@ import { getAlgorithms, postSort } from '../api';
 import type { AlgorithmMeta, PlaybackStatus, SortStep } from '../types';
 
 function makeArray(size: number): number[] {
-  return Array.from({ length: size }, () => Math.floor(Math.random() * 90) + 10);
+  const pool = Array.from({ length: 90 }, (_, i) => i + 10);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, size);
 }
 
 const speedToMs = (speed: number) => Math.round(1200 / speed);
@@ -11,8 +16,8 @@ const speedToMs = (speed: number) => Math.round(1200 / speed);
 export function useSorter() {
   const [algorithms, setAlgorithms] = useState<AlgorithmMeta[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [array, setArray] = useState<number[]>(() => makeArray(30));
-  const [arraySize, setArraySizeState] = useState(30);
+  const [array, setArray] = useState<number[]>(() => makeArray(10));
+  const [arraySize, setArraySizeState] = useState(10);
   const [steps, setSteps] = useState<SortStep[]>([]);
   const [currentStep, setCurrentStep] = useState(-1);
   const [status, setStatus] = useState<PlaybackStatus>('idle');
