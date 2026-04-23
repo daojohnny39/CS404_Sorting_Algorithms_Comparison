@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from models import AlgorithmMeta, SortRequest, SortResponse, SortStep
-from algorithms import generate_mock_steps, generate_merge_sort_steps
+from algorithms import generate_mock_steps, generate_merge_sort_steps, generate_bubble_sort_steps
 
 router = APIRouter()
 
@@ -73,6 +73,8 @@ def sort_array(request: SortRequest) -> SortResponse:
         )
     if request.algorithm == "merge":
         raw_steps = generate_merge_sort_steps(request.array)
+    elif request.algorithm == "bubble":
+        raw_steps = generate_bubble_sort_steps(request.array)
     else:
         raw_steps = generate_mock_steps(request.array)
     steps = [SortStep(**s) for s in raw_steps]

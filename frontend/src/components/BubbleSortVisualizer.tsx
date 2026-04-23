@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useSortSteps } from '../hooks/useSortSteps';
 import { usePlayback } from '../hooks/usePlayback';
-import SortTileGrid from './SortTileGrid';
-import PseudocodePanel from './PseudocodePanel';
+import BubbleSortTileGrid from './BubbleSortTileGrid';
+import BubblePseudocodePanel from './BubblePseudocodePanel';
 
 function generateArray(): number[] {
   const values = Array.from({ length: 90 }, (_, i) => i + 10);
@@ -15,19 +15,19 @@ function generateArray(): number[] {
 
 const OPERATION_LABELS: Record<string, string> = {
   start:          'Initializing',
-  split:          'Splitting',
-  merge_init:     'Merging',
+  pass_start:     'Pass Start',
   compare:        'Comparing',
-  write:          'Writing',
-  copy_remaining: 'Copying',
-  merged:         'Merged',
+  swap:           'Swapping',
+  swapped:        'Swapped',
+  element_sorted: 'Sorted',
+  early_exit:     'Early Exit',
   complete:       'Complete',
 };
 
-export default function ScrollSortVisualizer() {
+export default function BubbleSortVisualizer() {
   const [array, setArray] = useState<number[]>(() => generateArray());
 
-  const { steps, loading, error } = useSortSteps('merge', array);
+  const { steps, loading, error } = useSortSteps('bubble', array);
   const { playStepIndex, playbackState, isPlaying, speed, play, pause, resume, reset, cycleSpeed } =
     usePlayback(steps.length);
 
@@ -73,7 +73,7 @@ export default function ScrollSortVisualizer() {
             <p className="text-xs font-bold text-[#777777] uppercase tracking-widest mb-2">
               Press Play to begin
             </p>
-            <h2 className="text-3xl font-bold text-black">Merge Sort</h2>
+            <h2 className="text-3xl font-bold text-black">Bubble Sort</h2>
             <p className="text-[#555555] text-sm mt-2">
               10 elements ·{' '}
               {steps.length > 0 ? `${steps.length} steps` : loading ? 'loading…' : ''}
@@ -81,7 +81,7 @@ export default function ScrollSortVisualizer() {
           </div>
           <div className="flex items-center gap-3 pb-1">
             <div className="flex gap-1.5">
-              {['O(n log n)', 'stable', 'O(n) space'].map((tag) => (
+              {['O(n²)', 'stable', 'O(1) space'].map((tag) => (
                 <span
                   key={tag}
                   className="px-2.5 py-1 text-xs font-bold bg-white text-black border border-black"
@@ -157,7 +157,7 @@ export default function ScrollSortVisualizer() {
 
           {/* Tile grid */}
           <div className="flex-shrink-0">
-            <SortTileGrid array={displayArray} step={currentStep} />
+            <BubbleSortTileGrid array={displayArray} step={currentStep} />
           </div>
 
           {/* Step description */}
@@ -179,7 +179,7 @@ export default function ScrollSortVisualizer() {
           <div className="flex-shrink-0 flex items-center gap-6 border-t-2 border-black pt-4">
             {[
               { label: 'Comparisons', value: currentStep?.comparisons ?? 0 },
-              { label: 'Writes',      value: currentStep?.swaps ?? 0 },
+              { label: 'Swaps',       value: currentStep?.swaps ?? 0 },
               { label: 'Accesses',    value: currentStep?.array_accesses ?? 0 },
             ].map(({ label, value }) => (
               <div key={label}>
@@ -194,7 +194,7 @@ export default function ScrollSortVisualizer() {
 
         {/* ── Right column: pseudocode ── */}
         <div className="w-[340px] flex-shrink-0 overflow-y-auto">
-          <PseudocodePanel
+          <BubblePseudocodePanel
             activeLine={currentStep?.pseudocode_line ?? -1}
             step={currentStep}
           />
