@@ -2,7 +2,6 @@ import type { SortStep } from '../types';
 
 interface Props { activeLine: number; step: SortStep | null; }
 interface CodeLine { lineNum: number; text: string; }
-interface LegendItem { label: string; color: string; }
 
 const PSEUDOCODE: CodeLine[] = [
   { lineNum: 0,  text: 'function quickSort(arr, left, right):' },
@@ -23,13 +22,6 @@ const PSEUDOCODE: CodeLine[] = [
 
 const FUNCTION_HEADERS = new Set([0, 6]);
 
-const LEGEND: LegendItem[] = [
-  { label: 'Pivot',    color: '#1A1A1A' },
-  { label: 'Scanning', color: '#000000' },
-  { label: 'Swapping', color: '#555555' },
-  { label: 'Sorted',   color: '#A6A6A6' },
-  { label: 'Complete', color: '#D9D9D9' },
-];
 
 export default function QuickPseudocodePanel({ activeLine, step }: Props) {
   return (
@@ -58,17 +50,6 @@ export default function QuickPseudocodePanel({ activeLine, step }: Props) {
       {step?.description && (
         <p className="text-xs text-[#555555] leading-snug">{step.description}</p>
       )}
-      <div className="flex flex-wrap gap-x-3 gap-y-1.5">
-        {LEGEND.map((item) => (
-          <div key={item.label} className="flex items-center gap-1">
-            <div
-              className="flex-shrink-0"
-              style={{ width: 10, height: 10, backgroundColor: item.color, border: '1px solid #000000' }}
-            />
-            <span className="text-[10px] text-[#555555]">{item.label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

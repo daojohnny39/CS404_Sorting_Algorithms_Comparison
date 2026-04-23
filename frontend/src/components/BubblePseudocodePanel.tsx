@@ -22,12 +22,6 @@ const PSEUDOCODE: CodeLine[] = [
 
 const FUNCTION_HEADERS = new Set([0]);
 
-const LEGEND = [
-  { label: 'Comparing',     color: '#000000' },
-  { label: 'Swapping',      color: '#555555' },
-  { label: 'Locally sorted', color: '#A6A6A6' },
-  { label: 'Complete',      color: '#D9D9D9' },
-];
 
 export default function BubblePseudocodePanel({ activeLine, step }: Props) {
   return (
@@ -58,22 +52,6 @@ export default function BubblePseudocodePanel({ activeLine, step }: Props) {
         <p className="text-xs text-[#555555] leading-snug">{step.description}</p>
       )}
 
-      <div className="flex flex-wrap gap-x-3 gap-y-1.5">
-        {LEGEND.map((item) => (
-          <div key={item.label} className="flex items-center gap-1">
-            <div
-              className="flex-shrink-0"
-              style={{
-                width: 10,
-                height: 10,
-                backgroundColor: item.color,
-                border: '1px solid #000000',
-              }}
-            />
-            <span className="text-[10px] text-[#555555]">{item.label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
