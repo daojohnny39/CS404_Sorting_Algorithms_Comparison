@@ -15,7 +15,7 @@ const speedToMs = (speed: number) => Math.round(1200 / speed);
 
 export function useSorter() {
   const [algorithms, setAlgorithms] = useState<AlgorithmMeta[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>('bubble');
   const [array, setArray] = useState<number[]>(() => makeArray(10));
   const [arraySize, setArraySizeState] = useState(10);
   const [steps, setSteps] = useState<SortStep[]>([]);

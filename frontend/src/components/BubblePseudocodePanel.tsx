@@ -46,7 +46,7 @@ export default function BubblePseudocodePanel({ activeLine, step }: Props) {
                 color: isActive ? '#000000' : isHeader ? '#000000' : '#555555',
                 transition: 'background-color 150ms ease, border-color 150ms ease, color 150ms ease',
               }}
-              className="text-xs px-2 py-0.5 whitespace-pre leading-relaxed"
+              className="text-xs px-2 py-0.5 whitespace-pre-wrap leading-relaxed"
             >
               {line.text}
             </div>

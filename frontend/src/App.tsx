@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useSorter } from './hooks/useSorter';
+import ComparisonGraph from './components/ComparisonGraph';
 import AlgorithmSelector from './components/AlgorithmSelector';
 import Controls from './components/Controls';
 import StatsPanel from './components/StatsPanel';
@@ -36,7 +38,17 @@ const OPERATION_LABELS: Record<string, string> = {
 };
 
 export default function App() {
+  const [view, setView] = useState<'main' | 'comparison'>('main');
   const sorter = useSorter();
+
+  if (view === 'comparison') {
+    return (
+      <ComparisonGraph
+        initialArray={sorter.array}
+        onBack={() => setView('main')}
+      />
+    );
+  }
 
   const stepAvailable =
     sorter.steps.length > 0 && sorter.currentStep < sorter.steps.length - 1;
@@ -51,7 +63,7 @@ export default function App() {
       : '—';
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black relative">
       {/* Algorithm Playground */}
       <div className="border-t-2 border-black mt-4">
         <div className="max-w-7xl mx-auto px-4 py-10 space-y-4">
@@ -170,6 +182,13 @@ export default function App() {
           />
         </div>
       </div>
+
+      <button
+        onClick={() => setView('comparison')}
+        className="fixed bottom-6 right-6 px-4 py-2 border-2 border-black bg-white font-bold hover:bg-black hover:text-white transition-colors duration-100 cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
+      >
+        Comparison Graph
+      </button>
     </div>
   );
 }
