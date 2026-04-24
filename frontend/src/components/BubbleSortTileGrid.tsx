@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, LayoutGroup } from 'motion/react';
 import type { SortStep } from '../types';
 
 interface Props {
@@ -38,7 +38,7 @@ const COMPLETE_STYLE: TileStyle = {
 };
 
 const TILE_SIZE = 56;
-const ROW_HEIGHT = 52; // breathing room for lifted tiles (max lift is 44px + ~4px scale buffer)
+const ROW_HEIGHT = 52;
 
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
 const COLOR_TRANSITION = { duration: 0.18, ease: 'easeOut' } as const;
@@ -88,62 +88,64 @@ export default function BubbleSortTileGrid({ array, step }: Props) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: containerHeight }}>
-      {tiles.map(({ value, effectiveIndex, displaced }) => {
-        const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step, n);
-        const animY = tileStyle.liftY;
+      <LayoutGroup>
+        {tiles.map(({ value, effectiveIndex, displaced }) => {
+          const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step, n);
+          const animY = tileStyle.liftY;
 
-        return (
-          <motion.div
-            key={value}
-            initial={{ left: `${centerPct(effectiveIndex)}%` }}
-            style={{
-              position: 'absolute',
-              top: ROW_HEIGHT,
-              x: '-50%',
-              width: TILE_SIZE,
-              height: TILE_SIZE,
-              border: '2px solid',
-              borderRadius: '2px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'default',
-              userSelect: 'none',
-              zIndex: tileStyle.scale > 1 ? 20 : 10,
-            }}
-            animate={{
-              left: `${centerPct(effectiveIndex)}%`,
-              y: animY,
-              scale: tileStyle.scale,
-              backgroundColor: tileStyle.bg,
-              borderColor: tileStyle.borderColor,
-              boxShadow: tileStyle.boxShadow,
-              opacity: displaced ? 0 : 1,
-            }}
-            transition={{
-              left: SPRING,
-              y: SPRING,
-              scale: SPRING,
-              backgroundColor: COLOR_TRANSITION,
-              borderColor: COLOR_TRANSITION,
-              boxShadow: COLOR_TRANSITION,
-              opacity: COLOR_TRANSITION,
-            }}
-          >
-            <motion.span
-              animate={{ color: tileStyle.textColor }}
-              transition={COLOR_TRANSITION}
-              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
+          return (
+            <motion.div
+              key={value}
+              layout="position"
+              style={{
+                position: 'absolute',
+                left: `${centerPct(effectiveIndex)}%`,
+                top: ROW_HEIGHT,
+                marginLeft: -TILE_SIZE / 2,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                border: '2px solid',
+                borderRadius: '2px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'default',
+                userSelect: 'none',
+                zIndex: tileStyle.scale > 1 ? 20 : 10,
+              }}
+              animate={{
+                y: animY,
+                scale: tileStyle.scale,
+                backgroundColor: tileStyle.bg,
+                borderColor: tileStyle.borderColor,
+                boxShadow: tileStyle.boxShadow,
+                opacity: displaced ? 0 : 1,
+              }}
+              transition={{
+                layout: SPRING,
+                y: SPRING,
+                scale: SPRING,
+                backgroundColor: COLOR_TRANSITION,
+                borderColor: COLOR_TRANSITION,
+                boxShadow: COLOR_TRANSITION,
+                opacity: COLOR_TRANSITION,
+              }}
             >
-              {value}
-            </motion.span>
-            <span style={{ fontSize: '9px', color: 'rgba(0,0,0,0.25)', lineHeight: 1, marginTop: '2px' }}>
-              {effectiveIndex}
-            </span>
-          </motion.div>
-        );
-      })}
+              <motion.span
+                animate={{ color: tileStyle.textColor }}
+                transition={COLOR_TRANSITION}
+                style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
+              >
+                {value}
+              </motion.span>
+              <span style={{ fontSize: '9px', color: 'rgba(0,0,0,0.25)', lineHeight: 1, marginTop: '2px' }}>
+                {effectiveIndex}
+              </span>
+            </motion.div>
+          );
+        })}
+      </LayoutGroup>
     </div>
   );
 }

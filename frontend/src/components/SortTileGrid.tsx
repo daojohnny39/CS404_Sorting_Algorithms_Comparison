@@ -92,7 +92,7 @@ export default function SortTileGrid({ array, step }: Props) {
               position: 'absolute',
               top: 0,
               left: `${centerPct(i)}%`,
-              x: '-50%',
+              marginLeft: -TILE_SIZE / 2,
               width: TILE_SIZE,
               height: TILE_SIZE,
               border: '2px solid',
