@@ -13,23 +13,19 @@ import PseudocodePanel from './components/PseudocodePanel';
 import QuickPseudocodePanel from './components/QuickPseudocodePanel';
 
 const OPERATION_LABELS: Record<string, string> = {
-  // Shared
   start:          'Initializing',
   complete:       'Complete',
   compare:        'Comparing',
   swap:           'Swapping',
   swapped:        'Swapped',
-  // Bubble Sort
   pass_start:     'Pass Start',
   element_sorted: 'Sorted',
   early_exit:     'Early Exit',
-  // Quick Sort
   quick_call:     'Sorting Range',
   pivot_select:   'Pivot',
   pivot_place:    'Placing Pivot',
   partition_done: 'Partitioned',
   base_case:      'Base Case',
-  // Merge Sort
   split:          'Splitting',
   merge_init:     'Merging',
   write:          'Writing',
@@ -44,7 +40,8 @@ export default function App() {
   if (view === 'comparison') {
     return (
       <ComparisonGraph
-        initialArray={sorter.array}
+        arraysPerAlgorithm={sorter.arraysPerAlgorithm}
+        casesPerAlgorithm={sorter.casesPerAlgorithm}
         onBack={() => setView('main')}
       />
     );
@@ -78,6 +75,9 @@ export default function App() {
             algorithms={sorter.algorithms}
             selected={sorter.selectedAlgorithm}
             onSelect={sorter.selectAlgorithm}
+            casePerAlgorithm={sorter.casesPerAlgorithm}
+            onSetCase={sorter.setCaseForCurrentAlgorithm}
+            disabled={sorter.status === 'playing' || sorter.status === 'loading'}
           />
 
           <Controls
@@ -88,7 +88,6 @@ export default function App() {
             onPause={sorter.pause}
             onStep={sorter.stepForward}
             onReset={sorter.reset}
-            onGenerate={sorter.generateArray}
             onSpeedChange={sorter.setSpeed}
           />
 
@@ -98,15 +97,14 @@ export default function App() {
             {/* Left column */}
             <div className="flex-1 min-w-0 flex flex-col gap-4">
 
-              {/* Step counter + operation chip */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs tabular-nums text-[#777777]">{stepLabel}</span>
-                {opLabel && (
+              {/* Operation chip */}
+              {opLabel && (
+                <div className="flex items-center justify-end">
                   <span className="text-xs font-bold px-2.5 py-1 bg-white border border-black text-black">
                     {opLabel}
                   </span>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Tile grid — min-height accommodates the tallest grid (Quick Sort ~416px) */}
               <div style={{ minHeight: 420 }}>
@@ -123,23 +121,6 @@ export default function App() {
                   <div className="h-28 flex items-center justify-center text-[#AAAAAA] text-sm border-2 border-dashed border-[#DDDDDD]">
                     Select an algorithm to begin
                   </div>
-                )}
-              </div>
-
-              {/* Step description */}
-              <div className="min-h-[3rem]">
-                {sorter.currentStepData?.description ? (
-                  <p className="text-[#555555] text-sm leading-relaxed">
-                    {sorter.currentStepData.description}
-                  </p>
-                ) : (
-                  <p className="text-[#AAAAAA] text-sm">
-                    {sorter.status === 'loading'
-                      ? 'Loading steps from server…'
-                      : sorter.selectedAlgorithm
-                        ? 'Press Play to begin.'
-                        : ''}
-                  </p>
                 )}
               </div>
 

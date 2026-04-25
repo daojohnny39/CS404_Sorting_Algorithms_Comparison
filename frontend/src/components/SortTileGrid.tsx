@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import type { SortStep } from '../types';
 
@@ -45,6 +46,7 @@ const TILE_SIZE = 56;
 const TEMP_TILE_SIZE = 46;
 const TEMP_ROW_HEIGHT = 64;
 const TEMP_GAP = 20;
+const TOP_OFFSET = 52;
 
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
 const COLOR_TRANSITION = { duration: 0.18, ease: 'easeOut' } as const;
@@ -69,30 +71,77 @@ export default function SortTileGrid({ array, step }: Props) {
   const n = array.length;
   const MAX_DEPTH = n > 1 ? Math.ceil(Math.log2(n)) : 0;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const lastKnownPositions = useRef<Map<number, number>>(new Map());
+  const prevArrayRef = useRef<number[]>(array);
+
+  useLayoutEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+
+    const updateWidth = () => setContainerWidth(node.getBoundingClientRect().width);
+    updateWidth();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateWidth);
+    }
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    resizeObserver.observe(node);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  if (prevArrayRef.current !== array) {
+    prevArrayRef.current = array;
+    lastKnownPositions.current.clear();
+  }
+
   const hasTempRow = Boolean(step?.temp_snapshot?.length);
   const containerHeight =
-    (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE +
+    TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE +
     (hasTempRow ? TEMP_GAP + TEMP_ROW_HEIGHT : 0);
 
-  const centerPct = (i: number) => ((i + 0.5) / n) * 100;
+  const tileX = (i: number) => (n === 0 ? 0 : ((i + 0.5) / n) * containerWidth - TILE_SIZE / 2);
+
+  const seenInCurrent = new Set<number>(array);
+  const seen = new Set<number>();
+  const tiles: Array<{ value: number; effectiveIndex: number; displaced: boolean }> = [];
+
+  array.forEach((v, index) => {
+    if (!seen.has(v)) {
+      seen.add(v);
+      lastKnownPositions.current.set(v, index);
+      tiles.push({ value: v, effectiveIndex: index, displaced: false });
+    }
+  });
+
+  for (const [v, lastIndex] of lastKnownPositions.current) {
+    if (!seenInCurrent.has(v)) {
+      tiles.push({ value: v, effectiveIndex: lastIndex, displaced: true });
+    }
+  }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: containerHeight }}>
-
-      {/* ── Main array tiles ── */}
-      {array.map((value, i) => {
-        const tileStyle = getTileStyle(i, step, n);
-        const segDepth = getSegmentDepth(i, step?.segments);
-        const animY = segDepth * ROW_HEIGHT + tileStyle.liftY;
+    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: containerHeight }}>
+      {containerWidth > 0 && tiles.map(({ value, effectiveIndex, displaced }) => {
+        const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step, n);
+        const segDepth = displaced ? 0 : getSegmentDepth(effectiveIndex, step?.segments);
+        const x = tileX(effectiveIndex);
+        const y = TOP_OFFSET + segDepth * ROW_HEIGHT + tileStyle.liftY;
 
         return (
           <motion.div
-            key={i}
+            key={value}
+            initial={{ x, y, opacity: displaced ? 0 : 1 }}
             style={{
               position: 'absolute',
               top: 0,
-              left: `${centerPct(i)}%`,
-              marginLeft: -TILE_SIZE / 2,
+              left: 0,
               width: TILE_SIZE,
               height: TILE_SIZE,
               border: '2px solid',
@@ -106,22 +155,25 @@ export default function SortTileGrid({ array, step }: Props) {
               zIndex: tileStyle.scale > 1 ? 20 : 10,
             }}
             animate={{
-              y: animY,
+              x,
+              y,
               scale: tileStyle.scale,
               backgroundColor: tileStyle.bg,
               borderColor: tileStyle.borderColor,
               boxShadow: tileStyle.boxShadow,
+              opacity: displaced ? 0 : 1,
             }}
             transition={{
+              x: SPRING,
               y: SPRING,
               scale: SPRING,
               backgroundColor: COLOR_TRANSITION,
               borderColor: COLOR_TRANSITION,
               boxShadow: COLOR_TRANSITION,
+              opacity: COLOR_TRANSITION,
             }}
           >
             <motion.span
-              key={value}
               animate={{ color: tileStyle.textColor }}
               transition={COLOR_TRANSITION}
               style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
@@ -129,7 +181,7 @@ export default function SortTileGrid({ array, step }: Props) {
               {value}
             </motion.span>
             <span style={{ fontSize: '9px', color: 'rgba(0,0,0,0.25)', lineHeight: 1, marginTop: '2px' }}>
-              {i}
+              {effectiveIndex}
             </span>
           </motion.div>
         );
@@ -140,7 +192,7 @@ export default function SortTileGrid({ array, step }: Props) {
         <div
           style={{
             position: 'absolute',
-            top: (MAX_DEPTH + 1) * ROW_HEIGHT + TEMP_GAP,
+            top: TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TEMP_GAP,
             left: 0,
             right: 0,
           }}

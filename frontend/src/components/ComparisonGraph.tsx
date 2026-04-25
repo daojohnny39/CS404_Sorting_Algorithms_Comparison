@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { postSort } from '../api';
+import type { CaseType } from '../caseArrays';
 
 interface ComparisonGraphProps {
-  initialArray: number[];
+  arraysPerAlgorithm: Record<string, number[]>;
+  casesPerAlgorithm: Record<string, CaseType>;
   onBack: () => void;
 }
 
-export default function ComparisonGraph({ initialArray, onBack }: ComparisonGraphProps) {
+export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm, onBack }: ComparisonGraphProps) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const caseLabel = (ct: CaseType) => ct === 'average' ? 'Avg' : ct === 'best' ? 'Best' : 'Worst';
 
   useEffect(() => {
     async function fetchData() {
@@ -19,7 +23,7 @@ export default function ComparisonGraph({ initialArray, onBack }: ComparisonGrap
         const algs = ['bubble', 'merge', 'quick'];
         const results = await Promise.all(
           algs.map(async (id) => {
-            const res = await postSort(id, initialArray);
+            const res = await postSort(id, arraysPerAlgorithm[id]);
             const lastStep = res.steps[res.steps.length - 1];
             return {
               name: id === 'bubble' ? 'Bubble Sort' : id === 'merge' ? 'Merge Sort' : 'Quick Sort',
@@ -37,7 +41,7 @@ export default function ComparisonGraph({ initialArray, onBack }: ComparisonGrap
       }
     }
     fetchData();
-  }, [initialArray]);
+  }, [arraysPerAlgorithm]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-screen bg-white text-black">
@@ -58,10 +62,12 @@ export default function ComparisonGraph({ initialArray, onBack }: ComparisonGrap
     <div className="min-h-screen bg-white text-black p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
-          <div>
+          <div className="max-w-2xl">
             <h2 className="text-3xl font-bold">Runtime Comparison</h2>
             <p className="text-[#555555] mt-2">
-              Comparing operations for the current array of size {initialArray.length}
+              Bubble ({caseLabel(casesPerAlgorithm.bubble ?? 'average')}) ·{' '}
+              Merge ({caseLabel(casesPerAlgorithm.merge ?? 'average')}) ·{' '}
+              Quick ({caseLabel(casesPerAlgorithm.quick ?? 'average')}) — {Object.values(arraysPerAlgorithm)[0]?.length ?? 10} elements
             </p>
           </div>
           <button

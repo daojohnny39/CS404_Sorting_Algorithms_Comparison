@@ -15,14 +15,6 @@ export default function StatusMessage({ status, error, selectedAlgorithm }: Prop
     );
   }
 
-  if (status === 'done') {
-    return (
-      <div className="border-2 border-black bg-[#F5F5F5] px-4 py-3 text-sm text-black">
-        STATUS: Sorting complete — press Reset to start over or generate a new array.
-      </div>
-    );
-  }
-
   if (!selectedAlgorithm && status === 'idle') {
     return (
       <div className="border border-[#777777] bg-[#F5F5F5] px-4 py-3 text-sm text-[#555555]">

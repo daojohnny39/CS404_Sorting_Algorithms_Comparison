@@ -15,6 +15,7 @@ const COMPLETE_STYLE: TileStyle = { bg: '#D9D9D9', borderColor: '#000000', textC
 
 const ROW_HEIGHT = 60;
 const TILE_SIZE = 56;
+const TOP_OFFSET = 52;
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
 const COLOR_TRANSITION = { duration: 0.18, ease: 'easeOut' } as const;
 
@@ -46,7 +47,7 @@ export default function QuickSortTileGrid({ array, step }: Props) {
     lastKnownPositions.current.clear();
   }
 
-  const containerHeight = (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE;
+  const containerHeight = TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE;
   const centerPct = (i: number) => ((i + 0.5) / n) * 100;
 
   const seenInCurrent = new Set<number>(array);
@@ -76,7 +77,7 @@ export default function QuickSortTileGrid({ array, step }: Props) {
           style={{
             position: 'absolute',
             left: `${centerPct(step!.partition_index! + 0.5)}%`,
-            top: 0,
+            top: TOP_OFFSET,
             bottom: 0,
             width: 2,
             backgroundColor: 'rgba(0,0,0,0.15)',
@@ -88,7 +89,7 @@ export default function QuickSortTileGrid({ array, step }: Props) {
         {tiles.map(({ value, effectiveIndex, displaced }) => {
           const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step);
           const segDepth = displaced ? 0 : getSegmentDepth(effectiveIndex, step?.segments);
-          const animY = segDepth * ROW_HEIGHT + tileStyle.liftY;
+          const animY = TOP_OFFSET + segDepth * ROW_HEIGHT + tileStyle.liftY;
 
           return (
             <motion.div

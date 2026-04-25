@@ -1,27 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { getAlgorithms, postSort } from '../api';
 import type { AlgorithmMeta, PlaybackStatus, SortStep } from '../types';
-
-function makeArray(size: number): number[] {
-  const pool = Array.from({ length: 90 }, (_, i) => i + 10);
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, size);
-}
+import type { CaseType } from '../caseArrays';
+import { CASE_ARRAYS, DEFAULT_CASES } from '../caseArrays';
 
 const speedToMs = (speed: number) => Math.round(1200 / speed);
 
 export function useSorter() {
   const [algorithms, setAlgorithms] = useState<AlgorithmMeta[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>('bubble');
-  const [array, setArray] = useState<number[]>(() => makeArray(10));
-  const [arraySize, setArraySizeState] = useState(10);
+  const [casesPerAlgorithm, setCasesPerAlgorithm] = useState<Record<string, CaseType>>(DEFAULT_CASES);
   const [steps, setSteps] = useState<SortStep[]>([]);
   const [currentStep, setCurrentStep] = useState(-1);
   const [status, setStatus] = useState<PlaybackStatus>('idle');
-  const [speed, setSpeedState] = useState(3);
+  const [speed, setSpeedState] = useState(5);
   const [error, setError] = useState<string | null>(null);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -37,6 +29,18 @@ export function useSorter() {
         setError('Could not connect to the backend. Make sure it is running on port 8000.')
       );
   }, []);
+
+  const array = useMemo(() => {
+    const id = selectedId ?? 'bubble';
+    const caseType = casesPerAlgorithm[id] ?? 'average';
+    return CASE_ARRAYS[id][caseType];
+  }, [selectedId, casesPerAlgorithm]);
+
+  const arraysPerAlgorithm = useMemo(() => ({
+    bubble: CASE_ARRAYS.bubble[casesPerAlgorithm.bubble ?? 'average'],
+    merge: CASE_ARRAYS.merge[casesPerAlgorithm.merge ?? 'average'],
+    quick: CASE_ARRAYS.quick[casesPerAlgorithm.quick ?? 'average'],
+  }), [casesPerAlgorithm]);
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -107,15 +111,6 @@ export function useSorter() {
     setError(null);
   }, [clearTimer]);
 
-  const generateNewArray = useCallback(() => {
-    clearTimer();
-    setSteps([]);
-    setCurrentStep(-1);
-    setStatus('idle');
-    setError(null);
-    setArray(makeArray(arraySize));
-  }, [arraySize, clearTimer]);
-
   const selectAlgorithm = useCallback(
     (id: string) => {
       reset();
@@ -124,17 +119,13 @@ export function useSorter() {
     [reset]
   );
 
-  const setArraySize = useCallback(
-    (size: number) => {
-      setArraySizeState(size);
-      clearTimer();
-      setSteps([]);
-      setCurrentStep(-1);
-      setStatus('idle');
-      setError(null);
-      setArray(makeArray(size));
+  const setCaseForCurrentAlgorithm = useCallback(
+    (ct: CaseType) => {
+      if (!selectedId) return;
+      reset();
+      setCasesPerAlgorithm((prev) => ({ ...prev, [selectedId]: ct }));
     },
-    [clearTimer]
+    [selectedId, reset]
   );
 
   const setSpeed = useCallback(
@@ -157,20 +148,20 @@ export function useSorter() {
     selectedAlgorithm: selectedId,
     selectedAlgorithmMeta: algorithms.find((a) => a.id === selectedId) ?? null,
     array: currentStepData ? currentStepData.array : array,
-    arraySize,
     steps,
     currentStep,
     currentStepData,
     status,
     speed,
     error,
+    casesPerAlgorithm,
+    arraysPerAlgorithm,
     play,
     pause,
     stepForward,
     reset,
-    generateArray: generateNewArray,
     selectAlgorithm,
-    setArraySize,
+    setCaseForCurrentAlgorithm,
     setSpeed,
   };
 }

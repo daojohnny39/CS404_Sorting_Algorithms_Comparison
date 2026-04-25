@@ -16,13 +16,6 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-function Badge({ label, value }: { label: string; value: string }) {
-  return (
-    <span className="px-2 py-0.5 text-xs border border-black font-mono bg-white text-black">
-      {label}: {value}
-    </span>
-  );
-}
 
 export default function StatsPanel({ step, totalSteps, currentStep, algorithm }: Props) {
   return (
@@ -37,15 +30,6 @@ export default function StatsPanel({ step, totalSteps, currentStep, algorithm }:
         />
       </div>
 
-      {algorithm && (
-        <div className="mt-4 pt-4 border-t border-[#BDBDBD] flex flex-wrap gap-2 items-center">
-          <Badge label="Best" value={algorithm.time_complexity.best} />
-          <Badge label="Avg" value={algorithm.time_complexity.average} />
-          <Badge label="Worst" value={algorithm.time_complexity.worst} />
-          <Badge label="Space" value={algorithm.space_complexity} />
-          <Badge label="Stable" value={algorithm.stable ? 'yes' : 'no'} />
-        </div>
-      )}
     </div>
   );
 }

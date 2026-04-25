@@ -8,7 +8,6 @@ interface Props {
   onPause: () => void;
   onStep: () => void;
   onReset: () => void;
-  onGenerate: () => void;
   onSpeedChange: (s: number) => void;
 }
 
@@ -23,7 +22,6 @@ export default function Controls({
   onPause,
   onStep,
   onReset,
-  onGenerate,
   onSpeedChange,
 }: Props) {
   const isPlaying = status === 'playing';
@@ -33,7 +31,6 @@ export default function Controls({
   return (
     <div className="bg-[#F5F5F5] border-2 border-black p-4">
       <div className="flex flex-wrap items-center gap-3">
-        {/* Play / Pause */}
         {isPlaying ? (
           <button onClick={onPause} className={`${btn} bg-black text-white hover:bg-[#333333]`}>
             Pause
@@ -48,7 +45,6 @@ export default function Controls({
           </button>
         )}
 
-        {/* Step */}
         <button
           onClick={onStep}
           disabled={!stepAvailable || isBusy}
@@ -57,7 +53,6 @@ export default function Controls({
           Step →
         </button>
 
-        {/* Reset */}
         <button
           onClick={onReset}
           disabled={status === 'idle'}
@@ -66,16 +61,6 @@ export default function Controls({
           Reset
         </button>
 
-        {/* Generate */}
-        <button
-          onClick={onGenerate}
-          disabled={isBusy}
-          className={`${btn} bg-white border-2 border-black text-black hover:bg-[#E0E0E0]`}
-        >
-          New Array
-        </button>
-
-        {/* Speed */}
         <div className="flex items-center gap-2 ml-auto">
           <label className="text-xs text-[#555555] whitespace-nowrap select-none">
             Speed: {speed}x
@@ -89,7 +74,6 @@ export default function Controls({
             className="w-24"
           />
         </div>
-
       </div>
     </div>
   );

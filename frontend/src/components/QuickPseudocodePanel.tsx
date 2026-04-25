@@ -47,9 +47,6 @@ export default function QuickPseudocodePanel({ activeLine, step }: Props) {
           );
         })}
       </div>
-      {step?.description && (
-        <p className="text-xs text-[#555555] leading-snug">{step.description}</p>
-      )}
-    </div>
+</div>
   );
 }
