@@ -23,7 +23,7 @@ const PSEUDOCODE: CodeLine[] = [
 const FUNCTION_HEADERS = new Set([0]);
 
 
-export default function BubblePseudocodePanel({ activeLine, step }: Props) {
+export default function BubblePseudocodePanel({ activeLine, step: _step }: Props) {
   return (
     <div className="bg-[#F5F5F5] border-2 border-black p-4 flex flex-col gap-3">
       <div className="font-mono">

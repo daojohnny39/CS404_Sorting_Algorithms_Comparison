@@ -30,7 +30,7 @@ const PSEUDOCODE: CodeLine[] = [
 const FUNCTION_HEADERS = new Set([0, 7]);
 
 
-export default function PseudocodePanel({ activeLine, step }: Props) {
+export default function PseudocodePanel({ activeLine, step: _step }: Props) {
   return (
     <div className="bg-[#F5F5F5] border-2 border-black p-4 flex flex-col gap-3">
       <div className="font-mono">

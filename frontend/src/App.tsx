@@ -54,10 +54,6 @@ export default function App() {
     ? (OPERATION_LABELS[sorter.currentStepData.operation] ?? sorter.currentStepData.operation)
     : null;
 
-  const stepLabel =
-    sorter.currentStep >= 0 && sorter.steps.length > 0
-      ? `${sorter.currentStep + 1} / ${sorter.steps.length}`
-      : '—';
 
   return (
     <div className="min-h-screen bg-white text-black relative">
