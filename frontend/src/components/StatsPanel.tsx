@@ -17,19 +17,18 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 }
 
 
-export default function StatsPanel({ step, totalSteps, currentStep, algorithm: _algorithm }: Props) {
+export default function StatsPanel({ step, totalSteps, currentStep, algorithm }: Props) {
   return (
-    <div className="bg-[#F5F5F5] border-2 border-black p-4">
+    <div className="bg-[#F5F5F5] border-2 border-black p-4 space-y-4">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Stat label="Comparisons" value={step?.comparisons ?? 0} />
         <Stat label="Swaps" value={step?.swaps ?? 0} />
-        <Stat label="Array Accesses" value={step?.array_accesses ?? 0} />
+        <Stat label="Space" value={algorithm?.space_complexity ?? '—'} />
         <Stat
           label="Step"
           value={totalSteps > 0 ? `${currentStep + 1} / ${totalSteps}` : '—'}
         />
       </div>
-
     </div>
   );
 }

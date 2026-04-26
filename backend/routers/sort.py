@@ -26,7 +26,7 @@ ALGORITHMS: list[AlgorithmMeta] = [
         id="quick",
         name="Quick Sort",
         time_complexity={"best": "O(n log n)", "average": "O(n log n)", "worst": "O(n²)"},
-        space_complexity="O(log n)",
+        space_complexity="O(log n) avg, O(n) worst",
         description="Selects a pivot and partitions the array into elements less than and greater than the pivot, then recurses.",
         stable=False,
     ),

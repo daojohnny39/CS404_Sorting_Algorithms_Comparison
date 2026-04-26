@@ -32,7 +32,6 @@ class SortStep(BaseModel):
     sorted: list[int] = Field(default_factory=list)
     comparisons: int
     swaps: int
-    array_accesses: int
     operation: str = ""
     description: str = ""
     pseudocode_line: int = -1

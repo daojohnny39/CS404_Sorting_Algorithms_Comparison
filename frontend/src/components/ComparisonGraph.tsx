@@ -2,14 +2,21 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { postSort } from '../api';
 import type { CaseType } from '../caseArrays';
+import type { AlgorithmMeta } from '../types';
 
 interface ComparisonGraphProps {
   arraysPerAlgorithm: Record<string, number[]>;
   casesPerAlgorithm: Record<string, CaseType>;
+  algorithmMetas: AlgorithmMeta[];
   onBack: () => void;
 }
 
-export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm, onBack }: ComparisonGraphProps) {
+export default function ComparisonGraph({
+  arraysPerAlgorithm,
+  casesPerAlgorithm,
+  algorithmMetas,
+  onBack,
+}: ComparisonGraphProps) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +28,10 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
       setLoading(true);
       try {
         const algs = ['bubble', 'merge', 'quick'];
+        const metaById: Record<string, AlgorithmMeta> = Object.fromEntries(
+          algorithmMetas.map((meta) => [meta.id, meta])
+        );
+
         const results = await Promise.all(
           algs.map(async (id) => {
             const res = await postSort(id, arraysPerAlgorithm[id]);
@@ -29,7 +40,7 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
               name: id === 'bubble' ? 'Bubble Sort' : id === 'merge' ? 'Merge Sort' : 'Quick Sort',
               comparisons: lastStep.comparisons,
               swaps: lastStep.swaps,
-              accesses: lastStep.array_accesses,
+              space_complexity: metaById[id]?.space_complexity ?? '—',
             };
           })
         );
@@ -41,7 +52,7 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
       }
     }
     fetchData();
-  }, [arraysPerAlgorithm]);
+  }, [arraysPerAlgorithm, algorithmMetas]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-screen bg-white text-black">
@@ -82,7 +93,6 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
           {[
             { key: 'comparisons', label: 'Total Comparisons', color: '#000000' },
             { key: 'swaps',       label: 'Total Swaps/Writes', color: '#555555' },
-            { key: 'accesses',   label: 'Array Accesses',     color: '#AAAAAA' },
           ].map((metric) => (
             <div key={metric.key} className="border-2 border-black p-6 bg-white">
               <h3 className="text-lg font-bold mb-6 text-center">{metric.label}</h3>
@@ -101,6 +111,23 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
               </div>
             </div>
           ))}
+
+          <div className="border-2 border-black p-6 bg-white">
+            <h3 className="text-lg font-bold mb-6 text-center">Space Complexity</h3>
+            <div className="h-64 flex items-center">
+              <div className="w-full space-y-4">
+                {data.map((row) => (
+                  <div
+                    key={row.name}
+                    className="flex items-center justify-between gap-4 border-2 border-black px-4 py-3"
+                  >
+                    <span className="font-bold">{row.name}</span>
+                    <span className="font-mono text-xl font-bold">{row.space_complexity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="border-t-2 border-black pt-6">
@@ -112,7 +139,7 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
                   <th className="p-3 border border-black">Algorithm</th>
                   <th className="p-3 border border-black">Comparisons</th>
                   <th className="p-3 border border-black">Swaps / Writes</th>
-                  <th className="p-3 border border-black">Array Accesses</th>
+                  <th className="p-3 border border-black">Space Complexity</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,7 +148,7 @@ export default function ComparisonGraph({ arraysPerAlgorithm, casesPerAlgorithm,
                     <td className="p-3 border border-black font-bold">{row.name}</td>
                     <td className="p-3 border border-black">{row.comparisons}</td>
                     <td className="p-3 border border-black">{row.swaps}</td>
-                    <td className="p-3 border border-black">{row.accesses}</td>
+                    <td className="p-3 border border-black">{row.space_complexity}</td>
                   </tr>
                 ))}
               </tbody>

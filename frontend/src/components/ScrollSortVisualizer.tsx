@@ -180,7 +180,7 @@ export default function ScrollSortVisualizer() {
             {[
               { label: 'Comparisons', value: currentStep?.comparisons ?? 0 },
               { label: 'Writes',      value: currentStep?.swaps ?? 0 },
-              { label: 'Accesses',    value: currentStep?.array_accesses ?? 0 },
+              { label: 'Space',       value: 'O(n)' },
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-[10px] uppercase tracking-widest text-[#777777] mb-0.5">{label}</div>

@@ -43,9 +43,6 @@ const COMPLETE_STYLE: TileStyle = {
 
 const ROW_HEIGHT = 82;
 const TILE_SIZE = 56;
-const TEMP_TILE_SIZE = 46;
-const TEMP_ROW_HEIGHT = 64;
-const TEMP_GAP = 20;
 const TOP_OFFSET = 52;
 
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
@@ -101,10 +98,8 @@ export default function SortTileGrid({ array, step }: Props) {
     lastKnownPositions.current.clear();
   }
 
-  const hasTempRow = Boolean(step?.temp_snapshot?.length);
   const containerHeight =
-    TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE +
-    (hasTempRow ? TEMP_GAP + TEMP_ROW_HEIGHT : 0);
+    TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE;
 
   const tileX = (i: number) => (n === 0 ? 0 : ((i + 0.5) / n) * containerWidth - TILE_SIZE / 2);
 
@@ -186,66 +181,6 @@ export default function SortTileGrid({ array, step }: Props) {
           </motion.div>
         );
       })}
-
-      {/* ── Temp array row (shown during merge steps) ── */}
-      {hasTempRow && step?.temp_snapshot && (
-        <div
-          style={{
-            position: 'absolute',
-            top: TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TEMP_GAP,
-            left: 0,
-            right: 0,
-          }}
-        >
-          <div style={{ fontSize: '9px', color: 'rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6, paddingLeft: 2 }}>
-            temp
-          </div>
-          <div style={{ position: 'relative', height: TEMP_TILE_SIZE }}>
-            {step.temp_snapshot.map((val, ti) => {
-              const tempN = step.temp_snapshot!.length;
-              const leftLen = step.temp_left_range
-                ? step.temp_left_range[1] - step.temp_left_range[0] + 1
-                : Math.floor(tempN / 2);
-              const isLeftHalf = ti < leftLen;
-              const isActivePtr =
-                (isLeftHalf && ti === step.temp_left_ptr) ||
-                (!isLeftHalf && ti === step.temp_right_ptr);
-
-              return (
-                <div
-                  key={ti}
-                  style={{
-                    position: 'absolute',
-                    left: `${((ti + 0.5) / tempN) * 100}%`,
-                    transform: 'translateX(-50%)',
-                    width: TEMP_TILE_SIZE,
-                    height: TEMP_TILE_SIZE,
-                    borderRadius: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-                    border: isActivePtr
-                      ? '2px solid #000000'
-                      : '1px solid rgba(0,0,0,0.2)',
-                    backgroundColor: isActivePtr
-                      ? '#FFFFFF'
-                      : isLeftHalf
-                        ? '#D0D0D0'
-                        : '#E8E8E8',
-                    color: '#000000',
-                    transition: 'all 0.18s ease',
-                  }}
-                >
-                  {val}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -15,7 +15,6 @@ export interface SortStep {
   sorted: number[];
   comparisons: number;
   swaps: number;
-  array_accesses: number;
   operation?: string;
   description?: string;
   pseudocode_line?: number;

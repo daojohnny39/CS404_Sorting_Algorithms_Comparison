@@ -26,6 +26,7 @@ const OPERATION_LABELS: Record<string, string> = {
   pivot_place:    'Placing Pivot',
   partition_done: 'Partitioned',
   base_case:      'Base Case',
+  quick_return:   'Returning',
   split:          'Splitting',
   merge_init:     'Merging',
   write:          'Writing',
@@ -42,6 +43,7 @@ export default function App() {
       <ComparisonGraph
         arraysPerAlgorithm={sorter.arraysPerAlgorithm}
         casesPerAlgorithm={sorter.casesPerAlgorithm}
+        algorithmMetas={sorter.algorithms}
         onBack={() => setView('main')}
       />
     );
