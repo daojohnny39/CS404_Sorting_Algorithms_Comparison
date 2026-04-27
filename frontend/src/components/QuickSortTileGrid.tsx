@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { motion, LayoutGroup } from 'motion/react';
 import type { SortStep } from '../types';
 
-interface Props { array: number[]; step: SortStep | null; }
+interface Props { array: number[]; step: SortStep | null; compact?: boolean; }
 interface TileStyle { bg: string; borderColor: string; textColor: string; boxShadow: string; scale: number; liftY: number; }
 
 const DEFAULT_STYLE: TileStyle = { bg: '#F2F2F2', borderColor: '#000000', textColor: '#000000', boxShadow: 'none', scale: 1, liftY: 0 };
@@ -13,9 +13,6 @@ const PIVOT_STYLE: TileStyle = { bg: '#1A1A1A', borderColor: '#000000', textColo
 const SORTED_STYLE: TileStyle = { bg: '#A6A6A6', borderColor: '#666666', textColor: '#000000', boxShadow: 'none', scale: 1, liftY: 0 };
 const COMPLETE_STYLE: TileStyle = { bg: '#D9D9D9', borderColor: '#000000', textColor: '#000000', boxShadow: 'none', scale: 1, liftY: 0 };
 
-const ROW_HEIGHT = 60;
-const TILE_SIZE = 56;
-const TOP_OFFSET = 52;
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
 const COLOR_TRANSITION = { duration: 0.18, ease: 'easeOut' } as const;
 
@@ -36,8 +33,12 @@ function getSegmentDepth(index: number, segments: number[][] | undefined): numbe
   return seg ? seg[2] : 0;
 }
 
-export default function QuickSortTileGrid({ array, step }: Props) {
+export default function QuickSortTileGrid({ array, step, compact = false }: Props) {
   const n = array.length;
+  const TILE_SIZE = compact ? 36 : 56;
+  const ROW_HEIGHT = compact ? 38 : 60;
+  const TOP_OFFSET = compact ? 34 : 52;
+  const liftScale = compact ? 0.64 : 1;
   const MAX_DEPTH = Math.min(n - 1, 5);
   const lastKnownPositions = useRef<Map<number, number>>(new Map());
   const prevArrayRef = useRef<number[]>(array);
@@ -85,11 +86,11 @@ export default function QuickSortTileGrid({ array, step }: Props) {
           }}
         />
       )}
-      <LayoutGroup>
+      <LayoutGroup id="quick-tile-grid">
         {tiles.map(({ value, effectiveIndex, displaced }) => {
           const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step);
           const segDepth = displaced ? 0 : getSegmentDepth(effectiveIndex, step?.segments);
-          const animY = TOP_OFFSET + segDepth * ROW_HEIGHT + tileStyle.liftY;
+          const animY = TOP_OFFSET + segDepth * ROW_HEIGHT + tileStyle.liftY * liftScale;
 
           return (
             <motion.div
@@ -133,7 +134,7 @@ export default function QuickSortTileGrid({ array, step }: Props) {
               <motion.span
                 animate={{ color: tileStyle.textColor }}
                 transition={COLOR_TRANSITION}
-                style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
+                style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: compact ? '0.7rem' : '0.875rem', lineHeight: 1 }}
               >
                 {value}
               </motion.span>

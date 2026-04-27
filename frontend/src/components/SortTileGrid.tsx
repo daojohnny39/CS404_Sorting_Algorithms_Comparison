@@ -5,6 +5,7 @@ import type { SortStep } from '../types';
 interface Props {
   array: number[];
   step: SortStep | null;
+  compact?: boolean;
 }
 
 interface TileStyle {
@@ -41,10 +42,6 @@ const COMPLETE_STYLE: TileStyle = {
   boxShadow: 'none', scale: 1, liftY: 0,
 };
 
-const ROW_HEIGHT = 82;
-const TILE_SIZE = 56;
-const TOP_OFFSET = 52;
-
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
 const COLOR_TRANSITION = { duration: 0.18, ease: 'easeOut' } as const;
 
@@ -64,8 +61,12 @@ function getSegmentDepth(index: number, segments: number[][] | undefined): numbe
   return seg ? seg[2] : 0;
 }
 
-export default function SortTileGrid({ array, step }: Props) {
+export default function SortTileGrid({ array, step, compact = false }: Props) {
   const n = array.length;
+  const TILE_SIZE = compact ? 36 : 56;
+  const ROW_HEIGHT = compact ? 52 : 82;
+  const TOP_OFFSET = compact ? 34 : 52;
+  const liftScale = compact ? 0.64 : 1;
   const MAX_DEPTH = n > 1 ? Math.ceil(Math.log2(n)) : 0;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -127,7 +128,7 @@ export default function SortTileGrid({ array, step }: Props) {
         const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step, n);
         const segDepth = displaced ? 0 : getSegmentDepth(effectiveIndex, step?.segments);
         const x = tileX(effectiveIndex);
-        const y = TOP_OFFSET + segDepth * ROW_HEIGHT + tileStyle.liftY;
+        const y = TOP_OFFSET + segDepth * ROW_HEIGHT + tileStyle.liftY * liftScale;
 
         return (
           <motion.div
@@ -171,7 +172,7 @@ export default function SortTileGrid({ array, step }: Props) {
             <motion.span
               animate={{ color: tileStyle.textColor }}
               transition={COLOR_TRANSITION}
-              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
+              style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: compact ? '0.7rem' : '0.875rem', lineHeight: 1 }}
             >
               {value}
             </motion.span>

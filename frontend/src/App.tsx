@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSorter } from './hooks/useSorter';
 import ComparisonGraph from './components/ComparisonGraph';
+import CompareAllView from './components/CompareAllView';
 import AlgorithmSelector from './components/AlgorithmSelector';
 import Controls from './components/Controls';
 import StatsPanel from './components/StatsPanel';
@@ -35,8 +36,12 @@ const OPERATION_LABELS: Record<string, string> = {
 };
 
 export default function App() {
-  const [view, setView] = useState<'main' | 'comparison'>('main');
+  const [view, setView] = useState<'main' | 'comparison' | 'compare-all'>('main');
   const sorter = useSorter();
+
+  if (view === 'compare-all') {
+    return <CompareAllView onBack={() => setView('main')} />;
+  }
 
   if (view === 'comparison') {
     return (
@@ -76,6 +81,7 @@ export default function App() {
             casePerAlgorithm={sorter.casesPerAlgorithm}
             onSetCase={sorter.setCaseForCurrentAlgorithm}
             disabled={sorter.status === 'playing' || sorter.status === 'loading'}
+            onCompareAll={() => { sorter.pause(); setView('compare-all'); }}
           />
 
           <Controls

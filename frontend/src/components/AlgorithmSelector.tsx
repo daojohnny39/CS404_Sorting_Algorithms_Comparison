@@ -8,6 +8,7 @@ interface Props {
   casePerAlgorithm: Record<string, CaseType>;
   onSetCase: (ct: CaseType) => void;
   disabled: boolean;
+  onCompareAll?: () => void;
 }
 
 export default function AlgorithmSelector({
@@ -17,6 +18,7 @@ export default function AlgorithmSelector({
   casePerAlgorithm,
   onSetCase,
   disabled,
+  onCompareAll,
 }: Props) {
   const cases: { value: CaseType; label: string }[] = [
     { value: 'best', label: 'Best' },
@@ -78,6 +80,17 @@ export default function AlgorithmSelector({
             </div>
           </div>
         ))}
+
+        {onCompareAll && (
+          <div className="flex flex-col justify-start ml-2">
+            <button
+              onClick={onCompareAll}
+              className="px-4 py-2 border-2 border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors duration-100 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-black focus-visible:outline-offset-2"
+            >
+              Compare All
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

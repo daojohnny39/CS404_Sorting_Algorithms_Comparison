@@ -5,6 +5,7 @@ import type { SortStep } from '../types';
 interface Props {
   array: number[];
   step: SortStep | null;
+  compact?: boolean;
 }
 
 interface TileStyle {
@@ -37,9 +38,6 @@ const COMPLETE_STYLE: TileStyle = {
   boxShadow: 'none', scale: 1, liftY: 0,
 };
 
-const TILE_SIZE = 56;
-const ROW_HEIGHT = 52;
-
 const SPRING = { type: 'spring', stiffness: 260, damping: 28 } as const;
 const COLOR_TRANSITION = { duration: 0.18, ease: 'easeOut' } as const;
 
@@ -52,8 +50,11 @@ function getTileStyle(index: number, step: SortStep | null, n: number): TileStyl
   return DEFAULT_STYLE;
 }
 
-export default function BubbleSortTileGrid({ array, step }: Props) {
+export default function BubbleSortTileGrid({ array, step, compact = false }: Props) {
   const n = array.length;
+  const TILE_SIZE = compact ? 36 : 56;
+  const ROW_HEIGHT = compact ? 34 : 52;
+  const liftScale = compact ? 0.64 : 1;
 
   const lastKnownPositions = useRef<Map<number, number>>(new Map());
   const prevArrayRef = useRef<number[]>(array);
@@ -88,10 +89,10 @@ export default function BubbleSortTileGrid({ array, step }: Props) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: containerHeight }}>
-      <LayoutGroup>
+      <LayoutGroup id="bubble-tile-grid">
         {tiles.map(({ value, effectiveIndex, displaced }) => {
           const tileStyle = displaced ? DEFAULT_STYLE : getTileStyle(effectiveIndex, step, n);
-          const animY = tileStyle.liftY;
+          const animY = tileStyle.liftY * liftScale;
 
           return (
             <motion.div
@@ -135,7 +136,7 @@ export default function BubbleSortTileGrid({ array, step }: Props) {
               <motion.span
                 animate={{ color: tileStyle.textColor }}
                 transition={COLOR_TRANSITION}
-                style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', lineHeight: 1 }}
+                style={{ fontFamily: "'IBM Plex Mono', 'Courier New', monospace", fontWeight: 'bold', fontSize: compact ? '0.7rem' : '0.875rem', lineHeight: 1 }}
               >
                 {value}
               </motion.span>
