@@ -24,15 +24,6 @@ export interface SortStep {
   depth?: number;
   segments?: number[][];        // each inner array: [left, right, depth]
   merge_range?: number[];
-  temp_snapshot?: number[];
-  temp_left_range?: number[];
-  temp_right_range?: number[];
-  temp_left_ptr?: number;
-  temp_right_ptr?: number;
-  write_index?: number;
-  write_value?: number | null;
-  source_side?: string;
-  source_indices?: number[];
   pivot_index?: number;
   partition_index?: number;
   scan_index?: number;

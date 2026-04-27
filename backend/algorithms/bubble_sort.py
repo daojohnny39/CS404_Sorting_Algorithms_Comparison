@@ -47,10 +47,9 @@ def generate_bubble_sort_steps(array: list[int]) -> list[dict]:
 
             if arr[j] > arr[j + 1]:
                 stats["writes"] += 2
-                add_step("swap", f"Swapping {arr[j]} and {arr[j + 1]}", 4, swapping=[j, j + 1])
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
                 swapped = True
-                add_step("swapped", f"Swapped: {arr[j]} is now at index {j}, {arr[j + 1]} at index {j + 1}", 4)
+                add_step("swap", f"Swapped {arr[j]} and {arr[j + 1]}", 4, swapping=[j, j + 1])
 
         sorted_indices.add(n - 1 - i)
         add_step("element_sorted", f"Element {arr[n - 1 - i]} at index {n - 1 - i} is in its final position", 5)

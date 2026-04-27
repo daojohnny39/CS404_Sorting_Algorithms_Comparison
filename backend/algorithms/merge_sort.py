@@ -7,17 +7,12 @@ def generate_merge_sort_steps(array: list[int]) -> list[dict]:
     segments: list[list[int]] = [[0, n - 1, 0]] if n > 0 else []
 
     def add_step(op, desc, line, depth,
-                 comparing=None, overwriting=None,
-                 r=None, lr=None, rr=None,
-                 merge_range=None, temp_snapshot=None,
-                 temp_lr=None, temp_rr=None,
-                 t_l_ptr=-1, t_r_ptr=-1,
-                 w_idx=-1, w_val=None,
-                 src_side="", src_indices=None):
+                 comparing=None, swapping=None, overwriting=None,
+                 r=None, lr=None, rr=None, merge_range=None):
         steps.append({
             "array": list(arr),
             "comparing": comparing if comparing is not None else [],
-            "swapping": [],
+            "swapping": swapping if swapping is not None else [],
             "overwriting": overwriting if overwriting is not None else [],
             "sorted": sorted(list(merged_indices)),
             "comparisons": stats["comparisons"],
@@ -31,15 +26,6 @@ def generate_merge_sort_steps(array: list[int]) -> list[dict]:
             "depth": depth,
             "segments": [list(s) for s in segments],
             "merge_range": merge_range if merge_range is not None else [],
-            "temp_snapshot": temp_snapshot if temp_snapshot is not None else [],
-            "temp_left_range": temp_lr if temp_lr is not None else [],
-            "temp_right_range": temp_rr if temp_rr is not None else [],
-            "temp_left_ptr": t_l_ptr,
-            "temp_right_ptr": t_r_ptr,
-            "write_index": w_idx,
-            "write_value": w_val,
-            "source_side": src_side,
-            "source_indices": src_indices if src_indices is not None else [],
         })
 
     def merge_sort(left, right, depth):
@@ -61,66 +47,34 @@ def generate_merge_sort_steps(array: list[int]) -> list[dict]:
         merge_sort(left, mid, depth + 1)
         merge_sort(mid + 1, right, depth + 1)
 
-        left_len = mid - left + 1
-        right_len = right - mid
-        temp = arr[left:right + 1]
-        t_lr = [0, left_len - 1]
-        t_rr = [left_len, left_len + right_len - 1]
+        i = left
+        j = mid + 1
+        cur_mid = mid
 
         add_step("merge_init", f"Preparing to merge ranges [{left}, {mid}] and [{mid+1}, {right}]",
                  7, depth, r=[left, right], lr=[left, mid], rr=[mid+1, right],
-                 merge_range=[left, right], temp_snapshot=list(temp),
-                 temp_lr=t_lr, temp_rr=t_rr, t_l_ptr=0, t_r_ptr=0)
+                 merge_range=[left, right])
 
-        i = 0
-        j = 0
-        k = left
-
-        while i < left_len and j < right_len:
-            abs_i = left + i
-            abs_j = mid + 1 + j
-            add_step("compare", f"Comparing {temp[i]} (index {abs_i}) and {temp[left_len + j]} (index {abs_j})",
-                     10, depth, comparing=[abs_i, abs_j], r=[left, right],
-                     merge_range=[left, right], temp_snapshot=list(temp),
-                     temp_lr=t_lr, temp_rr=t_rr, t_l_ptr=i, t_r_ptr=j,
-                     src_indices=[abs_i, abs_j])
+        while i <= cur_mid and j <= right:
             stats["comparisons"] += 1
+            add_step("compare", f"Comparing arr[{i}]={arr[i]} and arr[{j}]={arr[j]}",
+                     10, depth, comparing=[i, j], r=[left, right], merge_range=[left, right])
 
-            if temp[i] <= temp[left_len + j]:
-                val = temp[i]; src_side = "left"; src_idx = abs_i; i += 1
+            if arr[i] <= arr[j]:
+                i += 1
             else:
-                val = temp[left_len + j]; src_side = "right"; src_idx = abs_j; j += 1
-
-            arr[k] = val
-            stats["writes"] += 1
-            add_step("write", f"Writing {val} from {src_side} half to index {k}",
-                     11, depth, overwriting=[k], r=[left, right],
-                     merge_range=[left, right], temp_snapshot=list(temp),
-                     temp_lr=t_lr, temp_rr=t_rr, t_l_ptr=i, t_r_ptr=j,
-                     w_idx=k, w_val=val, src_side=src_side, src_indices=[src_idx])
-            k += 1
-
-        while i < left_len:
-            val = temp[i]; abs_i = left + i
-            arr[k] = val
-            stats["writes"] += 1
-            add_step("copy_remaining", f"Copying remaining element {val} from left half to index {k}",
-                     12, depth, overwriting=[k], r=[left, right],
-                     merge_range=[left, right], temp_snapshot=list(temp),
-                     temp_lr=t_lr, temp_rr=t_rr, t_l_ptr=i, t_r_ptr=j,
-                     w_idx=k, w_val=val, src_side="left", src_indices=[abs_i])
-            i += 1; k += 1
-
-        while j < right_len:
-            val = temp[left_len + j]; abs_j = mid + 1 + j
-            arr[k] = val
-            stats["writes"] += 1
-            add_step("copy_remaining", f"Copying remaining element {val} from right half to index {k}",
-                     13, depth, overwriting=[k], r=[left, right],
-                     merge_range=[left, right], temp_snapshot=list(temp),
-                     temp_lr=t_lr, temp_rr=t_rr, t_l_ptr=i, t_r_ptr=j,
-                     w_idx=k, w_val=val, src_side="right", src_indices=[abs_j])
-            j += 1; k += 1
+                k = j
+                while k > i:
+                    l_val = arr[k - 1]
+                    r_val = arr[k]
+                    arr[k], arr[k - 1] = arr[k - 1], arr[k]
+                    stats["writes"] += 1
+                    add_step("swap", f"Swapping {l_val} (index {k-1}) and {r_val} (index {k})",
+                             11, depth, swapping=[k - 1, k], r=[left, right], merge_range=[left, right])
+                    k -= 1
+                i += 1
+                cur_mid += 1
+                j += 1
 
         for idx in range(left, right + 1):
             merged_indices.add(idx)
