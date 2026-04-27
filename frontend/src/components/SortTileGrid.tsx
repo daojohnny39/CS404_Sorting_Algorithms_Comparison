@@ -72,7 +72,7 @@ export default function SortTileGrid({ array, step, compact = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const lastKnownPositions = useRef<Map<number, number>>(new Map());
-  const prevArrayRef = useRef<number[]>(array);
+  const knownValues = useRef<Set<number>>(new Set());
 
   useLayoutEffect(() => {
     const node = containerRef.current;
@@ -94,10 +94,14 @@ export default function SortTileGrid({ array, step, compact = false }: Props) {
     return () => resizeObserver.disconnect();
   }, []);
 
-  if (prevArrayRef.current !== array) {
-    prevArrayRef.current = array;
+  // Detect a genuinely new sort: a value appears that was never seen before,
+  // AND knownValues is already non-empty (i.e., a previous sort had run).
+  const isNewSort = knownValues.current.size > 0 && array.some(v => !knownValues.current.has(v));
+  if (isNewSort) {
     lastKnownPositions.current.clear();
+    knownValues.current.clear();
   }
+  array.forEach(v => knownValues.current.add(v));
 
   const containerHeight =
     TOP_OFFSET + (MAX_DEPTH + 1) * ROW_HEIGHT + TILE_SIZE;
@@ -107,6 +111,16 @@ export default function SortTileGrid({ array, step, compact = false }: Props) {
   const seenInCurrent = new Set<number>(array);
   const seen = new Set<number>();
   const tiles: Array<{ value: number; effectiveIndex: number; displaced: boolean }> = [];
+
+  // Fix: prioritize write_index so the tile for write_value lands at k (the write
+  // destination) rather than at P (its stale original position still in the array).
+  if (step && step.write_index != null && step.write_index >= 0 && step.write_value != null) {
+    const wv = step.write_value;
+    const wi = step.write_index;
+    seen.add(wv);
+    lastKnownPositions.current.set(wv, wi);
+    tiles.push({ value: wv, effectiveIndex: wi, displaced: false });
+  }
 
   array.forEach((v, index) => {
     if (!seen.has(v)) {
@@ -133,7 +147,7 @@ export default function SortTileGrid({ array, step, compact = false }: Props) {
         return (
           <motion.div
             key={value}
-            initial={{ x, y, opacity: displaced ? 0 : 1 }}
+            initial={{ x, y, opacity: displaced ? 0.15 : 1 }}
             style={{
               position: 'absolute',
               top: 0,
@@ -157,7 +171,7 @@ export default function SortTileGrid({ array, step, compact = false }: Props) {
               backgroundColor: tileStyle.bg,
               borderColor: tileStyle.borderColor,
               boxShadow: tileStyle.boxShadow,
-              opacity: displaced ? 0 : 1,
+              opacity: displaced ? 0.15 : 1,
             }}
             transition={{
               x: SPRING,
